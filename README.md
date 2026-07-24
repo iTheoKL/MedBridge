@@ -25,13 +25,16 @@ The project started as a static frontend concept and has since grown into a work
 - Extended `backend/app.py` to save verified OCR results
 
 ### Medication List — Barath ([@barathchandp](https://github.com/barathchandp))
-- `list-of-med.html` — a page listing the patient's current medications
+- `medications.html` (originally `list-of-med.html`, later renamed) — a page listing the patient's current medications
 
 ### Medication Interaction Logic — jeevan ([@jeevan-hit](https://github.com/jeevan-hit))
 - `hittu/app.py`, `hittu/interaction_db.csv` — a script to print medication details/interactions plus a starter interaction database for detecting drug-interaction conflicts
 
 ### Reminders — dhinakaran ([@dhinakaran-cys](https://github.com/dhinakaran-cys))
 - `reminders.html`, `css/reminder.css`, `js/reminder.js` — a medication reminders page with its own styling and interactive logic
+
+### Reports — kugan ([@kugan6879-svg](https://github.com/kugan6879-svg))
+- `report.html`, `js/report.js` — a reporting page for generating/reviewing medication summaries
 
 ### Commit Log (chronological)
 1. **Dhayalan** — Initial commit
@@ -57,5 +60,9 @@ The project started as a static frontend concept and has since grown into a work
 21. **Barath** — Add files via upload (list-of-med.html)
 22. **vajahath** — Add files via upload (js/ocr.js)
 23. **vajahath** — Add files via upload (ocr.html)
+24. **Dhayalan** — Enhance README with project details and contributions
+25. **Barath** — Rename list-of-med.html to medications.html
+26. **kugan** — Add files via upload (js/report.js)
+27. **kugan** — Add files via upload (report.html)
 
 *(This section reflects commit history as of July 24, 2026.)*
