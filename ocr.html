@@ -4,6 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MedBridge · OCR Scan</title>
+  <script>
+    (function () {
+      var stored = localStorage.getItem("medbridge-theme");
+      var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <script>
+    (function () {
+      var session = null;
+      try { session = JSON.parse(localStorage.getItem("medbridge-auth")); } catch (e) {}
+      if (!session || !session.username) {
+        window.location.replace("login.html");
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -75,105 +91,121 @@
 
       <!-- Page Content -->
       <main class="content">
-        <div class="grid">
-          <!-- Scan card -->
-          <section class="card">
-            <div class="card__header">
-              <h2 class="card__title">Scan a Medication Label</h2>
-            </div>
-            <p class="card__subtitle">
-              Upload a photo of a prescription label or pill bottle. We'll extract the medication details
-              automatically so you can review and add them to your list.
-            </p>
+        <!-- Choose / capture an image -->
+        <section class="card">
+          <div class="card__header">
+            <h2 class="card__title">Scan a Medication Label</h2>
+          </div>
+          <p class="card__subtitle">
+            Upload a photo of a prescription label or pill bottle, or take one with your camera. We'll run
+            OCR and let you verify the details before saving.
+          </p>
 
-            <!-- Dropzone (shown before a file is chosen) -->
-            <label class="dropzone" id="dropzone" for="fileInput">
-              <span class="dropzone__icon">📷</span>
-              <p class="dropzone__title">Click to upload or drag an image here</p>
-              <p class="dropzone__hint">PNG, JPG up to 10MB</p>
-              <input type="file" id="fileInput" accept="image/*" />
-            </label>
+          <div class="form-actions" style="justify-content: flex-start;">
+            <button type="button" class="btn btn--secondary" id="chooseImageBtn">📁 Choose Image</button>
+            <button type="button" class="btn btn--secondary" id="takePhotoBtn">📷 Take Photo</button>
+            <input type="file" id="fileInput" accept="image/*" hidden />
+          </div>
 
-            <!-- Preview + scanning state (hidden until a file is chosen) -->
-            <div class="scan-preview" id="scanPreview" hidden>
-              <img class="scan-preview__image" id="previewImage" src="" alt="Uploaded label preview" />
-              <div class="scan-preview__meta">
-                <div class="scanning-indicator" id="scanningIndicator">
-                  <span class="spinner"></span>
-                  <span>Reading label…</span>
-                </div>
+          <div class="status-message status-message--error" id="ocrError" style="margin-top: 14px;" hidden></div>
 
-                <!-- Extracted fields form (hidden until scan completes) -->
-                <form class="modal__body" id="extractedForm" hidden style="margin-top: 4px;">
-                  <div class="form-group">
-                    <label class="form-label" for="medName">Medication Name</label>
-                    <input type="text" class="form-input" id="medName" />
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label class="form-label" for="medDosage">Dosage</label>
-                      <input type="text" class="form-input" id="medDosage" />
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label" for="medFrequency">Frequency</label>
-                      <input type="text" class="form-input" id="medFrequency" />
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label class="form-label" for="medDoctor">Prescribing Doctor</label>
-                      <input type="text" class="form-input" id="medDoctor" />
-                    </div>
-                    <div class="form-group">
-                      <label class="form-label" for="medExpiry">Expiry Date</label>
-                      <input type="date" class="form-input" id="medExpiry" />
-                    </div>
-                  </div>
-                  <p class="form-hint">Double-check these details before adding — OCR isn't always perfect.</p>
-                  <div class="form-actions">
-                    <button type="button" class="btn btn--secondary" id="scanAnotherBtn">Scan Another</button>
-                    <button type="submit" class="btn btn--primary" id="addToMedsBtn">Add to Medications</button>
-                  </div>
-                </form>
+          <!-- Image preview + run OCR -->
+          <div class="scan-preview" id="ocrPreview" style="margin-top: 18px;" hidden>
+            <img class="scan-preview__image" id="previewImage" src="" alt="Selected label preview" />
+            <div class="scan-preview__meta">
+              <div class="form-actions" style="justify-content: flex-start; margin-bottom: 4px;">
+                <button type="button" class="btn btn--primary" id="runOcrBtn">🔍 Run OCR</button>
+                <button type="button" class="btn btn--secondary" id="removeImageBtn">Remove</button>
+              </div>
+              <div class="scanning-indicator" id="ocrStatus" hidden>
+                <span class="spinner"></span>
+                <span id="ocrStatusText">Running OCR…</span>
               </div>
             </div>
+          </div>
+        </section>
+
+        <div class="grid" style="margin-top: 20px;">
+          <!-- Raw OCR text -->
+          <section class="card" id="rawResultsCard" hidden>
+            <div class="card__header">
+              <h2 class="card__title">Raw OCR Text</h2>
+            </div>
+            <p class="card__subtitle">This is exactly what was detected on the label, before any parsing.</p>
+            <ul class="med-reference-item__list" id="rawOcrList" style="padding-left: 20px;"></ul>
           </section>
 
-          <!-- Recent scans -->
-          <section class="card">
+          <!-- Verify & save -->
+          <section class="card" id="verifyCard" hidden>
             <div class="card__header">
-              <h2 class="card__title">Recent Scans</h2>
+              <h2 class="card__title">Verify &amp; Save</h2>
             </div>
-            <ul class="report-list" id="recentScans">
-              <li class="report-item">
-                <span class="report-item__icon">💊</span>
-                <div class="report-item__body">
-                  <p class="report-item__name">Metformin — 500mg</p>
-                  <p class="report-item__meta">Scanned 2 days ago</p>
+            <p class="card__subtitle">Double-check these details before saving — OCR isn't always perfect.</p>
+
+            <form class="modal__body" id="verifyForm">
+              <div class="form-group">
+                <label class="form-label" for="medicineName">Medicine Name</label>
+                <input type="text" class="form-input" id="medicineName" />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="genericName">Generic Name</label>
+                  <input type="text" class="form-input" id="genericName" />
                 </div>
-                <span class="pill pill--success">Added</span>
-              </li>
-              <li class="report-item">
-                <span class="report-item__icon">💊</span>
-                <div class="report-item__body">
-                  <p class="report-item__name">Warfarin — 5mg</p>
-                  <p class="report-item__meta">Scanned 1 week ago</p>
+                <div class="form-group">
+                  <label class="form-label" for="dosage">Dosage</label>
+                  <input type="text" class="form-input" id="dosage" />
                 </div>
-                <span class="pill pill--success">Added</span>
-              </li>
-            </ul>
+              </div>
+
+              <label class="checkbox-item" style="cursor: pointer;">
+                <input type="checkbox" id="confirmCheckbox" />
+                <div class="checkbox-item__label">
+                  <p class="checkbox-item__title">I've verified these details are correct</p>
+                </div>
+              </label>
+
+              <div class="status-message status-message--success" id="saveSuccess" hidden></div>
+              <div class="status-message status-message--error" id="saveError" hidden></div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn--secondary" id="startOverBtn">Start Over</button>
+                <button type="submit" class="btn btn--primary" id="saveBtn" disabled>✅ Verify & Save</button>
+              </div>
+            </form>
           </section>
         </div>
       </main>
     </div>
   </div>
 
-  <div class="toast" id="toast">
-    <span class="toast__icon">✅</span>
-    <span id="toastMessage">Saved</span>
+  <!-- Camera capture modal -->
+  <div class="modal-overlay camera-modal" id="cameraModal" hidden>
+    <div class="modal">
+      <div class="modal__header">
+        <h3 class="modal__title">Take a Photo</h3>
+        <button class="modal__close" id="closeCameraBtn" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="modal__body">
+        <video
+          id="cameraStream"
+          autoplay
+          playsinline
+          muted
+          style="width: 100%; border-radius: var(--radius-md); background: #000;"
+        ></video>
+        <canvas id="cameraCanvas" hidden></canvas>
+
+        <div class="form-actions" style="justify-content: center;">
+          <button type="button" class="btn btn--primary" id="captureBtn">📸 Capture</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="js/script.js"></script>
   <script src="js/ocr.js"></script>
+  <script src="js/theme.js"></script>
 </body>
 </html>
