@@ -4,6 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MedBridge · Manage Account</title>
+  <script>
+    (function () {
+      var stored = localStorage.getItem("medbridge-theme");
+      var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <script>
+    (function () {
+      var session = null;
+      try { session = JSON.parse(localStorage.getItem("medbridge-auth")); } catch (e) {}
+      if (!session || !session.username) {
+        window.location.replace("login.html");
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -196,5 +212,6 @@
 
   <script src="js/script.js"></script>
   <script src="js/account.js"></script>
+  <script src="js/theme.js"></script>
 </body>
 </html>
