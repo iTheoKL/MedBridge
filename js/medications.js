@@ -1,4 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // This is the canonical medication list for the whole app (what's shown
+  // on this page). js/symptoms.js and js/report.js each keep their own
+  // copy of this same data (name/dosage at minimum), since there's no
+  // shared module system across these plain <script> pages. If you add,
+  // remove, or edit a medication here, update those two files to match.
   let medications = [
     {
       id: 1,
@@ -26,6 +31,24 @@ document.addEventListener("DOMContentLoaded", () => {
       doctor: "Dr. Miguel Ortiz",
       status: "active",
       notes: "Avoid taking with NSAIDs — bleeding risk.",
+    },
+    {
+      id: 4,
+      name: "Paracetamol",
+      dosage: "500mg",
+      frequency: "Three times daily",
+      doctor: "Dr. Sarah Kim",
+      status: "active",
+      notes: "Take after meals for fever or pain relief.",
+    },
+    {
+      id: 5,
+      name: "Aspirin",
+      dosage: "400mg",
+      frequency: "Twice daily",
+      doctor: "Dr. James Okafor",
+      status: "active",
+      notes: "Take with food — increases bleeding risk when combined with Warfarin.",
     },
   ];
 
