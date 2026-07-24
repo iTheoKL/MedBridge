@@ -37,47 +37,65 @@ The project started as a static frontend concept and has since grown into a work
 - `report.html`, `js/report.js` — a reporting page for generating/reviewing medication summaries
 
 ### Symptom Tracking — Dhayalan ([@iTheoKL](https://github.com/iTheoKL))
-- `symptoms.html`, `js/symptoms.js` — a page for recording patient symptoms, working toward the Symptom & Side Effect Tracking feature
+- `symptoms.html`, `js/symptoms.js` — records patient symptoms and cross-checks them against known side effects of the medications in `js/medications.js`
+- **Note:** a later commit ("Add theme and auth scripts to symptoms.html") accidentally duplicated the entire page body after the closing `</html>` tag, leaving duplicate element IDs (`symptomForm`, `checkSymptomsBtn`, `results`, etc.). This has been fixed locally — the corrected `symptoms.html` needs to be committed to the repo.
+
+### Authentication & Theming — Dhayalan ([@iTheoKL](https://github.com/iTheoKL))
+- `login.html`, `logout.html`, `account.html`, `js/auth.js`, `js/logout.js`, `js/account.js` — a basic login/logout flow and account management page, gated by a `medbridge-auth` session check
+- `js/theme.js` plus new CSS variables — light/dark theme support (`medbridge-theme` preference), added across every page (index, medications, OCR, reminders, report, symptoms)
+- `.vercelignore` — excludes the Python backend and local-only files from the frontend's Vercel deployment
+
+### Drug Database — Theo ([@iTheoKL](https://github.com/iTheoKL)) / Barath ([@barathchandp](https://github.com/barathchandp))
+- `database/medications.csv` — an extensive India-focused A–Z medicines dataset (renamed/relocated a couple of times before settling here)
+- `database/data.json`, `database/users.json`, `database/placeholder.md` — supporting data files for the app
 
 ### Deployment — Dhayalan ([@iTheoKL](https://github.com/iTheoKL))
 - `requirements.txt` — pinned Python dependencies (`fastapi`, `uvicorn`, `python-multipart`, `easyocr`, `opencv-python-headless`, `numpy`) for hosting the backend
 - `preload_models.py` — downloads and caches the EasyOCR model weights ahead of time, so they don't need to be fetched on a cold start
 
-### Commit Log (chronological)
-1. **Dhayalan** — Initial commit
-2. **Dhayalan** — Expand README with key features of MedBridge
-3. **vajahath** — Implement MedBridge OCR API with image upload
-4. **vajahath** — Add files via upload (×3, supporting OCR backend files)
-5. **Dhayalan** — Create index.html
-6. **Dhayalan** — Add MedBridge Dashboard HTML structure
-7. **Dhayalan** — Create style.css
-8. **Dhayalan** — Update style.css
-9. **Dhayalan** — Fix CSS syntax
-10. **Dhayalan** — Create script.js
-11. **Dhayalan** — Implement user menu and navigation enhancements
-12. **Dhayalan** — Remove comment for user dropdown menu toggle
-13. **jeevan** — Implement medication details and interaction script
-14. **jeevan** — Add interaction database for drug interactions
-15. **Dhayalan** — Update README with project progress and contributions
-16. **Dhayalan** — Correct contributor names and update commit log
-17. **dhinakaran** — Add files via upload (reminders.html)
-18. **dhinakaran** — Add files via upload (css/reminder.css)
-19. **dhinakaran** — Add files via upload (js/reminder.js)
+### Commit Log (chronological, grouped)
+1–2. **Dhayalan** — Initial commit; expand README with key features
+3–6. **vajahath** — Implement MedBridge OCR API with image upload + supporting files
+7–12. **Dhayalan** — index.html, style.css, script.js, nav/user-menu enhancements
+13–14. **jeevan** — Medication details/interaction script + interaction database
+15–16. **Dhayalan** — Update README with progress + correct contributor names
+17–19. **dhinakaran** — reminders.html, css/reminder.css, js/reminder.js
 20. **vajahath** — Implement data saving for verified OCR results
-21. **Barath** — Add files via upload (list-of-med.html)
-22. **vajahath** — Add files via upload (js/ocr.js)
-23. **vajahath** — Add files via upload (ocr.html)
-24. **Dhayalan** — Enhance README with project details and contributions
+21. **Barath** — Add list-of-med.html
+22–23. **vajahath** — js/ocr.js, ocr.html
+24. **Dhayalan** — Enhance README with project details
 25. **Barath** — Rename list-of-med.html to medications.html
-26. **kugan** — Add files via upload (js/report.js)
-27. **kugan** — Add files via upload (report.html)
+26–27. **kugan** — js/report.js, report.html
 28. **vajahath** — Update sidebar brand link in ocr.html
 29. **Dhayalan** — Update README.md
-30. **Dhayalan** — Add required packages for the project (requirements.txt)
-31. **dhinakaran** — Update stylesheet and script references in reminders.html
-32. **dhinakaran** — Remove medication addition section from medications.html
-33. **Dhayalan** — Add preload_models.py to download EasyOCR models
-34. **Dhayalan** — Add files via upload (symptoms.html)
-35. **Dhayalan** — Add files via upload (js/symptoms.js)
+30. **Dhayalan** — Add requirements.txt
+31–32. **dhinakaran** — Update reminders.html refs; trim medications.html
+33. **Dhayalan** — Add preload_models.py
+34–35. **Dhayalan** — Add symptoms.html, js/symptoms.js
+36. **Dhayalan** — Update README with symptom tracking and deployment info
+37. **Dhayalan** — Create database/placeholder.md
+38. **Dhayalan** — Add drug database
+39–42. **Barath / Theo** — Rename/relocate medications.csv into database/
+43–44. **Dhayalan** — Add files via upload
+45. **Dhayalan** — Refactor CSS variables and styles for consistency
+46. **Dhayalan** — Add files via upload
+47–51. **Dhayalan** — Refactor medications.html, ocr.html, reminders.html, report.html, symptoms.html (styling/layout cleanup)
+52. **Dhayalan** — Add files via upload
+53. **Dhayalan** — Enhance theme support with new CSS variables
+54. **Dhayalan** — Add files via upload
+55. **Dhayalan** — Change logout redirect to login.html
+56. **Dhayalan** — Update print statement from 'Hello' to 'Goodbye'
+57. **Dhayalan** — Update script.js
+58. **Dhayalan** — Add .vercelignore
+59–67. **Dhayalan** — Roll out theme + auth guard scripts across account, index, logout, medications, OCR (+ camera capture), reminders, report, and symptoms pages
+68. **Dhayalan** — Modify symptoms.js (add Paracetamol/Aspirin entries)
+69. **Dhayalan** — Update print statement from 'Hello' to 'Goodbye' (symptoms.js)
+70. **Dhayalan** — Update medication reminders and interaction details
+71. **Dhayalan** — Add current medications section to report
+72. **Dhayalan** — Refactor report.js for improved report handling
+73. **Dhayalan** — Change toast and theme-toggle positions in CSS
+74. **Dhayalan** — Add new medications to the medication list
+75. **Dhayalan** — Enhance comments in symptoms.js for clarity
+76. **Dhayalan** — Clarify medication list synchronization in report.js
 
-*(This section reflects commit history as of July 24, 2026.)*
+*(This section reflects commit history as of July 25, 2026.)*
