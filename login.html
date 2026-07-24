@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedBridge · Log In</title>
+  <script>
+    (function () {
+      var stored = localStorage.getItem("medbridge-theme");
+      var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <script>
+    (function () {
+      // If we're already logged in, skip the login screen entirely.
+      var session = null;
+      try { session = JSON.parse(localStorage.getItem("medbridge-auth")); } catch (e) {}
+      if (session && session.username) {
+        window.location.replace("index.html");
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card auth-card--form">
+      <div class="auth-card__brand">
+        <span>🩺</span>
+        <span>MedBridge</span>
+      </div>
+
+      <h1 class="auth-card__title">Log In</h1>
+      <p class="auth-card__text">Sign in with one of the demo accounts below to continue.</p>
+
+      <form class="modal__body" id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="loginUsername">Username</label>
+          <input type="text" class="form-input" id="loginUsername" autocomplete="username" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Password</label>
+          <input type="password" class="form-input" id="loginPassword" autocomplete="current-password" required />
+        </div>
+
+        <div class="status-message status-message--error" id="loginMessage" hidden></div>
+
+        <button type="submit" class="btn btn--primary btn--full" id="loginSubmitBtn">Log In</button>
+      </form>
+
+      <div class="auth-card__footer">
+        <p class="form-hint">
+          Demo accounts (password is the same as the username):<br />
+          <strong>dhina</strong>, <strong>dhinakaran</strong>, <strong>Dhinakaran</strong>,
+          <strong>Barath</strong>, <strong>barath</strong>, <strong>vajahath</strong>,
+          <strong>Vajahath</strong>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/theme.js"></script>
+</body>
+</html>
