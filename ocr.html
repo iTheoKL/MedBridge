@@ -7,310 +7,15 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    /* ============================= */
-    /* OCR Scan Page (page-specific)  */
-    /* ============================= */
-
-    .ocr-card__hint {
-      margin: 0 0 18px;
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    /* Buttons */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      border-radius: 10px;
-      border: 1px solid transparent;
-      padding: 10px 18px;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease, transform 0.05s ease;
-    }
-
-    .btn:active {
-      transform: translateY(1px);
-    }
-
-    .btn:disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
-
-    .btn--primary {
-      background: var(--primary);
-      color: #fff;
-    }
-
-    .btn--primary:hover:not(:disabled) {
-      background: #2559c9;
-    }
-
-    .btn--secondary {
-      background: var(--sidebar-bg);
-      color: #fff;
-    }
-
-    .btn--secondary:hover:not(:disabled) {
-      background: var(--sidebar-bg-active);
-    }
-
-    .btn--outline {
-      background: transparent;
-      border-color: var(--border);
-      color: var(--text-primary);
-    }
-
-    .btn--outline:hover:not(:disabled) {
-      background: var(--bg);
-      border-color: #d6dbe6;
-    }
-
-    /* Upload actions */
-    .ocr-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 6px;
-    }
-
-    /* Image preview */
-    .ocr-preview {
-      margin-top: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 20px;
-      padding: 16px;
-      border: 1px dashed var(--border);
-      border-radius: var(--radius);
-      background: var(--bg);
-    }
-
-    .ocr-preview img {
-      max-width: 220px;
-      max-height: 220px;
-      border-radius: 10px;
-      object-fit: contain;
-      background: #fff;
-      border: 1px solid var(--border);
-    }
-
-    .ocr-preview__actions {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    /* Status / spinner */
-    .ocr-status {
-      margin-top: 18px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid var(--border);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      flex-shrink: 0;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* Raw OCR results */
-    .ocr-raw-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .ocr-raw-list li {
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--bg);
-      font-size: 13px;
-      color: var(--text-primary);
-    }
-
-    /* Verify form */
-    .verify-form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      max-width: 480px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-group label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .form-group input {
-      font-family: inherit;
-      font-size: 14px;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: #fff;
-      color: var(--text-primary);
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .form-group input:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(47, 111, 235, 0.15);
-    }
-
-    .checkbox-field {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      color: var(--text-secondary);
-      cursor: pointer;
-    }
-
-    .checkbox-field input {
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
-    }
-
-    .verify-form__actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 4px;
-    }
-
-    /* Save success banner */
-    .ocr-save-success {
-      margin-top: 18px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 16px;
-      border-radius: var(--radius);
-      background: var(--success-bg);
-      border: 1px solid rgba(46, 174, 98, 0.25);
-      color: #1d6b3e;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    /* Error banner */
-    .ocr-error {
-      margin-top: 18px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 16px;
-      border-radius: var(--radius);
-      background: var(--danger-bg);
-      border: 1px solid rgba(229, 72, 77, 0.25);
-      color: var(--danger);
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    /* Camera modal */
-    .camera-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(10, 15, 30, 0.65);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      padding: 20px;
-    }
-
-    .camera-modal[hidden] {
-      display: none;
-    }
-
-    .camera-modal__box {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      padding: 20px;
-      width: 100%;
-      max-width: 480px;
-      box-shadow: 0 20px 48px rgba(16, 24, 40, 0.25);
-    }
-
-    .camera-modal__header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-
-    .camera-modal__header h3 {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    .camera-modal__close {
-      background: transparent;
-      border: none;
-      font-size: 22px;
-      line-height: 1;
-      color: var(--text-secondary);
-      cursor: pointer;
-    }
-
-    .camera-modal video {
-      width: 100%;
-      border-radius: 10px;
-      background: #000;
-      max-height: 60vh;
-    }
-
-    .camera-modal__actions {
-      margin-top: 14px;
-      display: flex;
-      justify-content: center;
-    }
-  </style>
 </head>
 <body>
   <div class="app">
     <!-- Side Menu -->
     <aside class="sidebar">
-      <a href="index.html" class="sidebar__brand" style="text-decoration: none;">
+      <div class="sidebar__brand">
         <span class="sidebar__logo">🩺</span>
         <span class="sidebar__title">MedBridge</span>
-      </a>
+      </div>
 
       <nav class="sidebar__nav">
         <a href="ocr.html" class="nav-item" data-page="ocr">
@@ -370,109 +75,102 @@
 
       <!-- Page Content -->
       <main class="content">
-
-        <!-- Step 1: Choose or take image -->
-        <section class="card ocr-card">
-          <div class="card__header">
-            <h2 class="card__title">Scan Medicine Label</h2>
-          </div>
-          <p class="ocr-card__hint">
-            Choose a photo of the medicine packaging from your device, or take a picture using your camera.
-            MedBridge will run OCR and try to detect the medicine name, generic name, and dosage automatically.
-          </p>
-
-          <div class="ocr-actions">
-            <button type="button" class="btn btn--primary" id="chooseImageBtn">
-              <span>📁</span> Choose Image
-            </button>
-            <button type="button" class="btn btn--secondary" id="takePhotoBtn">
-              <span>📷</span> Take Photo
-            </button>
-            <input type="file" id="fileInput" accept="image/*" hidden />
-          </div>
-
-          <div class="ocr-preview" id="ocrPreview" hidden>
-            <img id="previewImage" alt="Selected medicine label preview" />
-            <div class="ocr-preview__actions">
-              <button type="button" class="btn btn--outline" id="removeImageBtn">Remove Image</button>
-              <button type="button" class="btn btn--primary" id="runOcrBtn">Run OCR</button>
+        <div class="grid">
+          <!-- Scan card -->
+          <section class="card">
+            <div class="card__header">
+              <h2 class="card__title">Scan a Medication Label</h2>
             </div>
-          </div>
+            <p class="card__subtitle">
+              Upload a photo of a prescription label or pill bottle. We'll extract the medication details
+              automatically so you can review and add them to your list.
+            </p>
 
-          <div class="ocr-status" id="ocrStatus" hidden>
-            <span class="spinner"></span>
-            <span id="ocrStatusText">Processing image…</span>
-          </div>
-
-          <div class="ocr-error" id="ocrError" hidden></div>
-        </section>
-
-        <!-- Step 2: Raw OCR output -->
-        <section class="card" id="rawResultsCard" hidden>
-          <div class="card__header">
-            <h2 class="card__title">Raw OCR Output</h2>
-          </div>
-          <ul class="ocr-raw-list" id="rawOcrList"></ul>
-        </section>
-
-        <!-- Step 3: Verify & save -->
-        <section class="card" id="verifyCard" hidden>
-          <div class="card__header">
-            <h2 class="card__title">Verify Medicine Details</h2>
-          </div>
-          <p class="ocr-card__hint">
-            OCR can misread labels. Please check the fields below and correct anything that looks wrong
-            before saving.
-          </p>
-
-          <form class="verify-form" id="verifyForm">
-            <div class="form-group">
-              <label for="medicineName">Medicine Name</label>
-              <input type="text" id="medicineName" name="medicineName" placeholder="e.g. Dolo-650" autocomplete="off" />
-            </div>
-
-            <div class="form-group">
-              <label for="genericName">Generic Name</label>
-              <input type="text" id="genericName" name="genericName" placeholder="e.g. Paracetamol Tablets IP" autocomplete="off" />
-            </div>
-
-            <div class="form-group">
-              <label for="dosage">Dosage</label>
-              <input type="text" id="dosage" name="dosage" placeholder="e.g. 650mg" autocomplete="off" />
-            </div>
-
-            <label class="checkbox-field">
-              <input type="checkbox" id="confirmCheckbox" />
-              <span>I have checked these details and confirm they are correct</span>
+            <!-- Dropzone (shown before a file is chosen) -->
+            <label class="dropzone" id="dropzone" for="fileInput">
+              <span class="dropzone__icon">📷</span>
+              <p class="dropzone__title">Click to upload or drag an image here</p>
+              <p class="dropzone__hint">PNG, JPG up to 10MB</p>
+              <input type="file" id="fileInput" accept="image/*" />
             </label>
 
-            <div class="verify-form__actions">
-              <button type="button" class="btn btn--outline" id="startOverBtn">Start Over</button>
-              <button type="submit" class="btn btn--primary" id="saveBtn" disabled>✅ Verify &amp; Save</button>
+            <!-- Preview + scanning state (hidden until a file is chosen) -->
+            <div class="scan-preview" id="scanPreview" hidden>
+              <img class="scan-preview__image" id="previewImage" src="" alt="Uploaded label preview" />
+              <div class="scan-preview__meta">
+                <div class="scanning-indicator" id="scanningIndicator">
+                  <span class="spinner"></span>
+                  <span>Reading label…</span>
+                </div>
+
+                <!-- Extracted fields form (hidden until scan completes) -->
+                <form class="modal__body" id="extractedForm" hidden style="margin-top: 4px;">
+                  <div class="form-group">
+                    <label class="form-label" for="medName">Medication Name</label>
+                    <input type="text" class="form-input" id="medName" />
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label" for="medDosage">Dosage</label>
+                      <input type="text" class="form-input" id="medDosage" />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="medFrequency">Frequency</label>
+                      <input type="text" class="form-input" id="medFrequency" />
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label" for="medDoctor">Prescribing Doctor</label>
+                      <input type="text" class="form-input" id="medDoctor" />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="medExpiry">Expiry Date</label>
+                      <input type="date" class="form-input" id="medExpiry" />
+                    </div>
+                  </div>
+                  <p class="form-hint">Double-check these details before adding — OCR isn't always perfect.</p>
+                  <div class="form-actions">
+                    <button type="button" class="btn btn--secondary" id="scanAnotherBtn">Scan Another</button>
+                    <button type="submit" class="btn btn--primary" id="addToMedsBtn">Add to Medications</button>
+                  </div>
+                </form>
+              </div>
             </div>
-          </form>
+          </section>
 
-          <div class="ocr-save-success" id="saveSuccess" hidden></div>
-          <div class="ocr-error" id="saveError" hidden></div>
-        </section>
-
+          <!-- Recent scans -->
+          <section class="card">
+            <div class="card__header">
+              <h2 class="card__title">Recent Scans</h2>
+            </div>
+            <ul class="report-list" id="recentScans">
+              <li class="report-item">
+                <span class="report-item__icon">💊</span>
+                <div class="report-item__body">
+                  <p class="report-item__name">Metformin — 500mg</p>
+                  <p class="report-item__meta">Scanned 2 days ago</p>
+                </div>
+                <span class="pill pill--success">Added</span>
+              </li>
+              <li class="report-item">
+                <span class="report-item__icon">💊</span>
+                <div class="report-item__body">
+                  <p class="report-item__name">Warfarin — 5mg</p>
+                  <p class="report-item__meta">Scanned 1 week ago</p>
+                </div>
+                <span class="pill pill--success">Added</span>
+              </li>
+            </ul>
+          </section>
+        </div>
       </main>
     </div>
   </div>
 
-  <!-- Camera Modal -->
-  <div class="camera-modal" id="cameraModal" hidden>
-    <div class="camera-modal__box">
-      <div class="camera-modal__header">
-        <h3>Take a Photo</h3>
-        <button type="button" class="camera-modal__close" id="closeCameraBtn" aria-label="Close camera">&times;</button>
-      </div>
-      <video id="cameraStream" autoplay playsinline muted></video>
-      <canvas id="cameraCanvas" hidden></canvas>
-      <div class="camera-modal__actions">
-        <button type="button" class="btn btn--primary" id="captureBtn">📸 Capture</button>
-      </div>
-    </div>
+  <div class="toast" id="toast">
+    <span class="toast__icon">✅</span>
+    <span id="toastMessage">Saved</span>
   </div>
 
   <script src="js/script.js"></script>
