@@ -1,0 +1,19 @@
+# Python backend (not deployed — see project docs for backend hosting)
+backend/
+hittu/
+requirements.txt
+preload_models.py
+
+# Local "database" files — was used for account storage; login is now a
+# fixed client-side allowlist (see js/auth.js), so none of this is read
+# by the deployed frontend. Keeping it out of the deployment either way.
+database/
+
+# Runtime artifacts created by backend/app.py when run locally
+data/
+uploads/
+
+# Misc
+__pycache__/
+*.pyc
+.DS_Store
