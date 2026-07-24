@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedBridge · Reminders</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app">
+    <!-- Side Menu -->
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <span class="sidebar__logo">🩺</span>
+        <span class="sidebar__title">MedBridge</span>
+      </div>
+
+      <nav class="sidebar__nav">
+        <a href="ocr.html" class="nav-item" data-page="ocr">
+          <span class="nav-item__icon">📷</span>
+          <span class="nav-item__label">OCR Scan</span>
+        </a>
+        <a href="medications.html" class="nav-item" data-page="medications">
+          <span class="nav-item__icon">💊</span>
+          <span class="nav-item__label">List of Medications</span>
+        </a>
+        <a href="reminders.html" class="nav-item" data-page="reminders">
+          <span class="nav-item__icon">⏰</span>
+          <span class="nav-item__label">Reminders</span>
+        </a>
+        <a href="report.html" class="nav-item" data-page="report">
+          <span class="nav-item__icon">📄</span>
+          <span class="nav-item__label">Download Report</span>
+        </a>
+        <a href="symptoms.html" class="nav-item" data-page="symptoms">
+          <span class="nav-item__icon">🩹</span>
+          <span class="nav-item__label">Symptoms</span>
+        </a>
+      </nav>
+
+      <div class="sidebar__footer">
+        <p>&copy; 2026 MedBridge</p>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar__left">
+          <h1 class="topbar__title">Reminders</h1>
+        </div>
+
+        <div class="topbar__right">
+          <button class="btn btn--primary" id="addReminderBtn" type="button">
+            <span class="btn__icon" aria-hidden="true">＋</span>
+            Add Reminder
+          </button>
+
+          <div class="user-menu" id="userMenu">
+            <button class="user-menu__trigger" id="userMenuTrigger" aria-haspopup="true" aria-expanded="false">
+              <span class="user-menu__avatar">JD</span>
+              <span class="user-menu__name">Jane Doe</span>
+              <span class="user-menu__caret">▾</span>
+            </button>
+
+            <div class="user-menu__dropdown" id="userMenuDropdown">
+              <a href="account.html" class="user-menu__item">
+                <span class="user-menu__item-icon">⚙️</span> Manage Account
+              </a>
+              <a href="logout.html" class="user-menu__item user-menu__item--danger">
+                <span class="user-menu__item-icon">🚪</span> Log Out
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <main class="content" id="remindersPage">
+
+        <!-- Inline validation / status toast -->
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+        <!-- Dashboard Statistics -->
+        <section class="stat-strip" aria-label="Reminder overview">
+          <div class="stat-card">
+            <p class="stat-card__value" id="statTotal">0</p>
+            <p class="stat-card__label">Total Medicines</p>
+          </div>
+          <div class="stat-card">
+            <p class="stat-card__value" id="statActive">0</p>
+            <p class="stat-card__label">Active Reminders</p>
+          </div>
+          <div class="stat-card stat-card--success">
+            <p class="stat-card__value" id="statCompleted">0</p>
+            <p class="stat-card__label">Completed Today</p>
+          </div>
+          <div class="stat-card stat-card--danger">
+            <p class="stat-card__value" id="statMissed">0</p>
+            <p class="stat-card__label">Missed Today</p>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <p class="stat-card__value" id="statUpcoming">0</p>
+            <p class="stat-card__label">Upcoming Today</p>
+          </div>
+        </section>
+
+        <div class="grid grid--reminders">
+          <!-- Left column: Today's schedule + Calendar -->
+          <div class="col col--side">
+            <section class="card">
+              <div class="card__header">
+                <h2 class="card__title">Today&rsquo;s Schedule</h2>
+              </div>
+              <ul class="schedule-list" id="scheduleList">
+                <!-- populated by JS -->
+              </ul>
+              <p class="empty-state" id="scheduleEmpty" hidden>No reminders scheduled for today.</p>
+            </section>
+
+            <section class="card">
+              <div class="card__header">
+                <h2 class="card__title" id="calendarMonthLabel">Calendar</h2>
+                <div class="calendar-nav">
+                  <button type="button" class="icon-btn" id="calPrevBtn" aria-label="Previous month">‹</button>
+                  <button type="button" class="icon-btn" id="calNextBtn" aria-label="Next month">›</button>
+                </div>
+              </div>
+              <div class="calendar" id="calendarGrid" role="grid" aria-label="Reminder calendar"></div>
+              <div class="calendar-day-detail" id="calendarDayDetail" hidden>
+                <p class="calendar-day-detail__title" id="calendarDayTitle"></p>
+                <ul class="calendar-day-detail__list" id="calendarDayList"></ul>
+              </div>
+            </section>
+          </div>
+
+          <!-- Right column: Search/filter + Reminder list -->
+          <div class="col col--main">
+            <section class="card">
+              <div class="card__header card__header--toolbar">
+                <h2 class="card__title">All Reminders</h2>
+                <div class="toolbar">
+                  <div class="toolbar__search">
+                    <span class="toolbar__search-icon" aria-hidden="true">🔍</span>
+                    <input
+                      type="search"
+                      id="searchInput"
+                      class="toolbar__search-input"
+                      placeholder="Search by medicine name…"
+                      aria-label="Search reminders by medicine name"
+                    />
+                  </div>
+
+                  <select id="filterSelect" class="toolbar__select" aria-label="Filter reminders">
+                    <option value="all">All</option>
+                    <option value="active">Active</option>
+                    <option value="completed">Completed Today</option>
+                    <option value="missed">Missed Today</option>
+                    <option value="today">Today&rsquo;s</option>
+                    <option value="high-priority">High Priority</option>
+                  </select>
+
+                  <select id="sortSelect" class="toolbar__select" aria-label="Sort reminders">
+                    <option value="time">Sort: Time</option>
+                    <option value="name">Sort: Name</option>
+                    <option value="priority">Sort: Priority</option>
+                    <option value="frequency">Sort: Frequency</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="reminder-cards" id="reminderCards">
+                <!-- populated by JS -->
+              </div>
+
+              <div class="empty-state empty-state--block" id="reminderCardsEmpty" hidden>
+                <p class="empty-state__icon" aria-hidden="true">💊</p>
+                <p class="empty-state__title">No reminders yet</p>
+                <p class="empty-state__text">Add your first medicine reminder to get started.</p>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add / Edit Reminder Modal -->
+  <div class="modal-overlay" id="reminderModalOverlay" hidden>
+    <div
+      class="modal"
+      id="reminderModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reminderModalTitle"
+    >
+      <div class="modal__header">
+        <h2 class="modal__title" id="reminderModalTitle">Add Reminder</h2>
+        <button class="modal__close" id="reminderModalClose" type="button" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <form class="reminder-form" id="reminderForm" novalidate>
+        <input type="hidden" id="reminderId" />
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="fieldName">Medicine Name <span class="required" aria-hidden="true">*</span></label>
+            <input type="text" id="fieldName" name="name" required autocomplete="off" />
+            <p class="form-field__error" id="errorName" role="alert"></p>
+          </div>
+          <div class="form-field">
+            <label for="fieldDosage">Dosage <span class="required" aria-hidden="true">*</span></label>
+            <input type="text" id="fieldDosage" name="dosage" placeholder="e.g. 500mg, 1 tablet" required />
+            <p class="form-field__error" id="errorDosage" role="alert"></p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="fieldTime">Reminder Time <span class="required" aria-hidden="true">*</span></label>
+            <input type="time" id="fieldTime" name="time" required />
+            <p class="form-field__error" id="errorTime" role="alert"></p>
+          </div>
+          <div class="form-field">
+            <label for="fieldFrequency">Frequency <span class="required" aria-hidden="true">*</span></label>
+            <select id="fieldFrequency" name="frequency" required>
+              <option value="daily">Daily</option>
+              <option value="twice-daily">Twice Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row" id="customFrequencyRow" hidden>
+          <div class="form-field form-field--full">
+            <label for="fieldCustomFrequency">Custom Frequency Notes</label>
+            <input type="text" id="fieldCustomFrequency" name="customFrequency" placeholder="e.g. every 3 days, as needed" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="fieldStartDate">Start Date <span class="required" aria-hidden="true">*</span></label>
+            <input type="date" id="fieldStartDate" name="startDate" required />
+            <p class="form-field__error" id="errorStartDate" role="alert"></p>
+          </div>
+          <div class="form-field">
+            <label for="fieldEndDate">End Date <span class="optional">(optional)</span></label>
+            <input type="date" id="fieldEndDate" name="endDate" />
+            <p class="form-field__error" id="errorEndDate" role="alert"></p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="fieldMealTiming">Meal Timing</label>
+            <select id="fieldMealTiming" name="mealTiming">
+              <option value="before">Before Food</option>
+              <option value="after" selected>After Food</option>
+              <option value="with">With Food</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="fieldPriority">Priority</label>
+            <select id="fieldPriority" name="priority">
+              <option value="normal">Normal</option>
+              <option value="important">Important</option>
+              <option value="critical">Critical</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="fieldNotifyOffset">Notify Me</label>
+            <select id="fieldNotifyOffset" name="notifyOffset">
+              <option value="0">At reminder time</option>
+              <option value="5">5 minutes before</option>
+              <option value="custom">Custom interval</option>
+            </select>
+          </div>
+          <div class="form-field" id="customOffsetField" hidden>
+            <label for="fieldCustomOffset">Minutes Before</label>
+            <input type="number" id="fieldCustomOffset" name="customOffset" min="1" max="180" placeholder="e.g. 15" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field form-field--full">
+            <label for="fieldNotes">Notes</label>
+            <textarea id="fieldNotes" name="notes" rows="2" placeholder="Optional notes, e.g. take with plenty of water"></textarea>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field form-field--full form-field--toggle">
+            <label class="toggle" for="fieldEnabled">
+              <input type="checkbox" id="fieldEnabled" name="enabled" checked />
+              <span class="toggle__track" aria-hidden="true"><span class="toggle__thumb"></span></span>
+              <span class="toggle__label">Enable Reminder</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost" id="reminderCancelBtn">Cancel</button>
+          <button type="submit" class="btn btn--primary" id="reminderSaveBtn">Save Reminder</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
