@@ -1,0 +1,379 @@
+<!--
+  report.html — Doctor Consultation Report page for the AI Medicine
+  Management System (MedBridge).
+
+  Assumptions made (I couldn't reach the actual repo — GitHub blocks
+  automated fetching of repo pages, and this project isn't indexed
+  anywhere searchable):
+    1. The project's existing stylesheet is named "style.css" and
+       sits next to this file. If yours is named/located differently,
+       just update the <link href="..."> below — nothing else changes.
+    2. "Back to Dashboard" points to "index.html". Update the href if
+       your landing page has a different filename.
+
+  Everything below that isn't already covered by style.css lives in
+  the <style> block here (scoped under .report-page so it won't
+  clash with the rest of the site). Report data is filled in by
+  report.js on load — see getReportData() there.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consultation Report – AI Medicine Management System</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+  /* Report-page-only styles. Falls back to sensible looks on its own
+     if style.css doesn't already define .card / .badge / .btn, and
+     won't fight with the rest of the site since it's namespaced
+     under .report-page. */
+
+  .report-page {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 24px 20px 64px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1f2937;
+  }
+
+  .report-page .report-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .report-page .report-back {
+    color: #0e7c7b;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .report-page .report-back:hover,
+  .report-page .report-back:focus-visible {
+    text-decoration: underline;
+  }
+
+  .report-page .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .report-page .btn-secondary {
+    background: #ffffff;
+    border-color: #d1d5db;
+    color: #1f2937;
+  }
+  .report-page .btn-secondary:hover { background: #f3f4f6; }
+  .report-page .btn:focus-visible {
+    outline: 2px solid #0e7c7b;
+    outline-offset: 2px;
+  }
+
+  .report-page .report-header { margin-bottom: 24px; }
+  .report-page .report-header h1 { font-size: 24px; margin: 0 0 4px; }
+  .report-page .report-header p { margin: 0; color: #6b7280; font-size: 14px; }
+
+  .report-page .card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .report-page .card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .report-page .card-header .icon { font-size: 18px; }
+  .report-page .card-header h2 { font-size: 16px; margin: 0; }
+
+  .report-page .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+  }
+  .report-page .info-item .info-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #6b7280;
+    margin-bottom: 2px;
+  }
+  .report-page .info-item .info-value { font-size: 15px; font-weight: 600; }
+
+  .report-page table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .report-page th, .report-page td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid #eef0f2;
+  }
+  .report-page th {
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .report-page .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .report-page .badge-active { background: #f0fdf4; color: #15803d; }
+  .report-page .badge-paused { background: #fffbeb; color: #b45309; }
+  .report-page .badge-stopped { background: #fef2f2; color: #b91c1c; }
+  .report-page .badge-default { background: #f3f4f6; color: #374151; }
+
+  .report-page .adherence-stats {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .report-page .adherence-stats .stat-value { font-size: 22px; font-weight: 700; }
+  .report-page .adherence-stats .stat-label { font-size: 12px; color: #6b7280; }
+  .report-page .adherence-bar {
+    background: #eef0f2;
+    border-radius: 999px;
+    height: 10px;
+    overflow: hidden;
+  }
+  .report-page .adherence-bar__fill {
+    height: 100%;
+    background: #0e7c7b;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+  }
+  .report-page .adherence-bar__fill--warn { background: #b45309; }
+
+  .report-page .symptom-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+  }
+  .report-page .symptom-chip {
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 13px;
+  }
+
+  .report-page .severity-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .report-page .severity-badge--high { background: #fef2f2; color: #b91c1c; }
+  .report-page .severity-badge--medium { background: #fffbeb; color: #b45309; }
+  .report-page .severity-badge--low { background: #f0fdf4; color: #15803d; }
+  .report-page .severity-badge--none { background: #f3f4f6; color: #374151; }
+
+  .report-page .interaction-card { border-color: #fecaca; background: #fff8f8; }
+  .report-page .interaction-list { margin: 0; padding-left: 18px; font-size: 14px; }
+
+  .report-page .recommendation-box {
+    background: #f0fdfa;
+    border: 1px solid #ccf3ef;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .report-page .signature-area { display: flex; justify-content: flex-end; margin-top: 8px; }
+  .report-page .signature-line { text-align: center; font-size: 13px; color: #6b7280; }
+  .report-page .signature-line .line {
+    display: block;
+    width: 220px;
+    border-top: 1px solid #9ca3af;
+    margin-bottom: 6px;
+  }
+
+  .report-page .report-footer {
+    text-align: center;
+    color: #9ca3af;
+    font-size: 12px;
+    margin-top: 24px;
+  }
+
+  @media print {
+    .report-page .report-toolbar { display: none; }
+    .report-page .card { break-inside: avoid; border-color: #d1d5db; }
+    body { background: #ffffff; }
+  }
+</style>
+</head>
+<body>
+<div class="report-page">
+
+  <div class="report-toolbar">
+    <a href="index.html" class="report-back">← Back to Dashboard</a>
+    <button id="printReportBtn" class="btn btn-secondary" type="button">🖨️ Print / Save as PDF</button>
+  </div>
+
+  <div class="report-header">
+    <h1>Doctor Consultation Report</h1>
+    <p>AI Medicine Management System · <span id="reportGeneratedAt">Generating…</span></p>
+  </div>
+
+  <section class="card">
+    <div class="card-header">
+      <span class="icon">👤</span>
+      <h2>Patient Information</h2>
+    </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">Name</div>
+        <div class="info-value" id="patientName">—</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Age</div>
+        <div class="info-value" id="patientAge">—</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Gender</div>
+        <div class="info-value" id="patientGender">—</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Blood Group</div>
+        <div class="info-value" id="patientBloodGroup">—</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Phone</div>
+        <div class="info-value" id="patientPhone">—</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <span class="icon">💊</span>
+      <h2>Current Medications</h2>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Medicine</th>
+          <th>Dose</th>
+          <th>Frequency</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="medsTableBody">
+        <!-- rows rendered by report.js -->
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <span class="icon">📊</span>
+      <h2>Medication Adherence</h2>
+    </div>
+    <div class="adherence-stats">
+      <div>
+        <div class="stat-value" id="adherenceTaken">—</div>
+        <div class="stat-label">Taken Doses</div>
+      </div>
+      <div>
+        <div class="stat-value" id="adherenceMissed">—</div>
+        <div class="stat-label">Missed Doses</div>
+      </div>
+      <div>
+        <div class="stat-value" id="adherencePercent">—</div>
+        <div class="stat-label">Adherence</div>
+      </div>
+    </div>
+    <div class="adherence-bar">
+      <div class="adherence-bar__fill" id="adherenceBarFill" style="width: 0%;"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <span class="icon">🩺</span>
+      <h2>Reported Symptoms</h2>
+    </div>
+    <ul class="symptom-list" id="symptomsList">
+      <!-- chips rendered by report.js -->
+    </ul>
+  </section>
+
+  <section class="card interaction-card">
+    <div class="card-header">
+      <span class="icon">⚠️</span>
+      <h2>Drug Interaction Analysis</h2>
+    </div>
+    <span class="severity-badge" id="interactionSeverityBadge">—</span>
+    <ul class="interaction-list" id="interactionDetailsList">
+      <!-- rendered by report.js -->
+    </ul>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <span class="icon">👨‍👩‍👦</span>
+      <h2>Caregiver Information</h2>
+    </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">Name</div>
+        <div class="info-value" id="caregiverName">—</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Relationship</div>
+        <div class="info-value" id="caregiverRelationship">—</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Alert</div>
+        <div class="info-value" id="caregiverAlert">—</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <span class="icon">🤖</span>
+      <h2>AI Recommendation</h2>
+    </div>
+    <p class="recommendation-box" id="aiRecommendationText">—</p>
+  </section>
+
+  <div class="signature-area">
+    <div class="signature-line">
+      <span class="line"></span>
+      Doctor Signature
+    </div>
+  </div>
+
+  <p class="report-footer">Generated by AI Medicine Management System</p>
+
+</div>
+
+<script src="report.js"></script>
+</body>
+</html>
