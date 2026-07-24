@@ -36,6 +36,13 @@ The project started as a static frontend concept and has since grown into a work
 ### Reports — kugan ([@kugan6879-svg](https://github.com/kugan6879-svg))
 - `report.html`, `js/report.js` — a reporting page for generating/reviewing medication summaries
 
+### Symptom Tracking — Dhayalan ([@iTheoKL](https://github.com/iTheoKL))
+- `symptoms.html`, `js/symptoms.js` — a page for recording patient symptoms, working toward the Symptom & Side Effect Tracking feature
+
+### Deployment — Dhayalan ([@iTheoKL](https://github.com/iTheoKL))
+- `requirements.txt` — pinned Python dependencies (`fastapi`, `uvicorn`, `python-multipart`, `easyocr`, `opencv-python-headless`, `numpy`) for hosting the backend
+- `preload_models.py` — downloads and caches the EasyOCR model weights ahead of time, so they don't need to be fetched on a cold start
+
 ### Commit Log (chronological)
 1. **Dhayalan** — Initial commit
 2. **Dhayalan** — Expand README with key features of MedBridge
@@ -64,5 +71,13 @@ The project started as a static frontend concept and has since grown into a work
 25. **Barath** — Rename list-of-med.html to medications.html
 26. **kugan** — Add files via upload (js/report.js)
 27. **kugan** — Add files via upload (report.html)
+28. **vajahath** — Update sidebar brand link in ocr.html
+29. **Dhayalan** — Update README.md
+30. **Dhayalan** — Add required packages for the project (requirements.txt)
+31. **dhinakaran** — Update stylesheet and script references in reminders.html
+32. **dhinakaran** — Remove medication addition section from medications.html
+33. **Dhayalan** — Add preload_models.py to download EasyOCR models
+34. **Dhayalan** — Add files via upload (symptoms.html)
+35. **Dhayalan** — Add files via upload (js/symptoms.js)
 
 *(This section reflects commit history as of July 24, 2026.)*
