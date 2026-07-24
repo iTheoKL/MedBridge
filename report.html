@@ -91,6 +91,29 @@
 
       <!-- Page Content -->
       <main class="content">
+        <!-- Current medications (kept in sync with medications.html) -->
+        <section class="card" style="margin-bottom: 20px;">
+          <div class="card__header">
+            <h2 class="card__title">Current Medications</h2>
+            <a href="medications.html" class="card__link">Manage medications</a>
+          </div>
+          <p class="card__subtitle">This is the data your report will be built from.</p>
+
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Medication</th>
+                  <th>Dosage</th>
+                  <th>Frequency</th>
+                  <th>Prescribing Doctor</th>
+                </tr>
+              </thead>
+              <tbody id="reportMedTableBody"></tbody>
+            </table>
+          </div>
+        </section>
+
         <div class="grid">
           <!-- Report builder -->
           <section class="card">
