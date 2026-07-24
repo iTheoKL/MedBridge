@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MedBridge · List of Medications</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* Extra styles for the highlighted medication list window.
+     Reuses the same CSS variables/tokens defined in css/style.css
+     so it matches the rest of the app. */
+  .med-highlight {
+    max-width: 640px;
+    margin: 0 auto 24px;
+    background: var(--card-bg);
+    border: 1px solid var(--primary);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 18px rgba(47, 111, 235, 0.18);
+    padding: 22px 24px;
+  }
+
+  .med-highlight__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .med-highlight__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .med-highlight__count {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+    background: #eaf0fe;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
+  .med-highlight__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .med-add-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--primary);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .med-add-btn:hover {
+    background: #2559c9;
+  }
+
+  .med-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .med-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+  }
+
+  .med-item__icon {
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .med-item__details {
+    flex: 1;
+  }
+
+  .med-item__name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .med-item__meta {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .med-item__remove {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--danger);
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .med-item__remove:hover {
+    background: var(--danger-bg);
+    border-color: rgba(229, 72, 77, 0.35);
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Side Menu -->
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar__brand" style="text-decoration: none;">
+      <span class="sidebar__logo">🩺</span>
+      <span class="sidebar__title">MedBridge</span>
+    </a>
+
+    <nav class="sidebar__nav">
+      <a href="ocr.html" class="nav-item" data-page="ocr">
+        <span class="nav-item__icon">📷</span>
+        <span class="nav-item__label">OCR Scan</span>
+      </a>
+      <a href="list-of-med.html" class="nav-item" data-page="medications">
+        <span class="nav-item__icon">💊</span>
+        <span class="nav-item__label">List of Medications</span>
+      </a>
+      <a href="reminders.html" class="nav-item" data-page="reminders">
+        <span class="nav-item__icon">⏰</span>
+        <span class="nav-item__label">Reminders</span>
+      </a>
+      <a href="report.html" class="nav-item" data-page="report">
+        <span class="nav-item__icon">📄</span>
+        <span class="nav-item__label">Download Report</span>
+      </a>
+      <a href="symptoms.html" class="nav-item" data-page="symptoms">
+        <span class="nav-item__icon">🩹</span>
+        <span class="nav-item__label">Symptoms</span>
+      </a>
+    </nav>
+
+    <div class="sidebar__footer">
+      <p>&copy; 2026 MedBridge</p>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar__left">
+        <h1 class="topbar__title">List of Medications</h1>
+      </div>
+
+      <div class="topbar__right">
+        <div class="user-menu" id="userMenu">
+          <button class="user-menu__trigger" id="userMenuTrigger" aria-haspopup="true" aria-expanded="false">
+            <span class="user-menu__avatar">JD</span>
+            <span class="user-menu__name">Jane Doe</span>
+            <span class="user-menu__caret">▾</span>
+          </button>
+          <div class="user-menu__dropdown" id="userMenuDropdown">
+            <a href="account.html" class="user-menu__item">
+              <span class="user-menu__item-icon">⚙️</span> Manage Account
+            </a>
+            <a href="logout.html" class="user-menu__item user-menu__item--danger">
+              <span class="user-menu__item-icon">🚪</span> Log Out
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="content">
+
+      <!-- Highlighted Medication List Window -->
+      <section class="med-highlight">
+        <div class="med-highlight__header">
+          <h2 class="med-highlight__title">💊 Current Medications</h2>
+          <div class="med-highlight__actions">
+            <span class="med-highlight__count" id="medCount">3 Active</span>
+            <button class="med-add-btn" id="addMedBtn" type="button">
+              <span>&#43;</span> Add Medication
+            </button>
+          </div>
+        </div>
+
+        <ul class="med-list">
+          <li class="med-item">
+            <span class="med-item__icon">💊</span>
+            <div class="med-item__details">
+              <p class="med-item__name">Metformin — 500mg</p>
+              <p class="med-item__meta">1 tablet · With breakfast · Daily</p>
+            </div>
+            <span class="pill pill--upcoming">Active</span>
+            <button class="med-item__remove" aria-label="Remove Metformin" title="Remove medication">&times;</button>
+          </li>
+
+          <li class="med-item">
+            <span class="med-item__icon">💊</span>
+            <div class="med-item__details">
+              <p class="med-item__name">Ibuprofen — 200mg</p>
+              <p class="med-item__meta">1 tablet · After lunch · As needed</p>
+            </div>
+            <span class="pill pill--warning">Interaction Risk</span>
+            <button class="med-item__remove" aria-label="Remove Ibuprofen" title="Remove medication">&times;</button>
+          </li>
+
+          <li class="med-item">
+            <span class="med-item__icon">💊</span>
+            <div class="med-item__details">
+              <p class="med-item__name">Warfarin — 5mg</p>
+              <p class="med-item__meta">1 tablet · Before bed · Daily</p>
+            </div>
+            <span class="pill pill--warning">Interaction Risk</span>
+            <button class="med-item__remove" aria-label="Remove Warfarin" title="Remove medication">&times;</button>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Additional page content can go below -->
+      <div class="grid">
+        <section class="card">
+          <div class="card__header">
+            <h2 class="card__title">Add a Medication</h2>
+          </div>
+          <p style="color: var(--text-secondary); font-size: 14px;">
+            Use the form (coming soon) to add a new medication to your profile.
+          </p>
+        </section>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="js/script.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const medList = document.querySelector(".med-list");
+    const medCount = document.getElementById("medCount");
+    const addMedBtn = document.getElementById("addMedBtn");
+
+    function updateCount() {
+      const count = medList.querySelectorAll(".med-item").length;
+      medCount.textContent = `${count} Active`;
+    }
+
+    function attachRemoveHandler(button) {
+      button.addEventListener("click", () => {
+        const item = button.closest(".med-item");
+        if (item) {
+          item.remove();
+          updateCount();
+        }
+      });
+    }
+
+    // Wire up remove buttons already in the list
+    medList.querySelectorAll(".med-item__remove").forEach(attachRemoveHandler);
+
+    // Add Medication flow (simple prompt-based; swap for a modal/form later)
+    addMedBtn.addEventListener("click", () => {
+      const name = prompt("Medication name (e.g. Amoxicillin — 250mg):");
+      if (!name) return;
+      const meta = prompt("Dosage / schedule (e.g. 1 capsule · Twice daily):") || "";
+
+      const li = document.createElement("li");
+      li.className = "med-item";
+      li.innerHTML = `
+        <span class="med-item__icon">💊</span>
+        <div class="med-item__details">
+          <p class="med-item__name">${name}</p>
+          <p class="med-item__meta">${meta}</p>
+        </div>
+        <span class="pill pill--upcoming">Active</span>
+        <button class="med-item__remove" aria-label="Remove ${name}" title="Remove medication">&times;</button>
+      `;
+
+      medList.appendChild(li);
+      attachRemoveHandler(li.querySelector(".med-item__remove"));
+      updateCount();
+    });
+  });
+</script>
+</body>
+</html>
