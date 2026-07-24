@@ -4,6 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MedBridge · Reminders</title>
+  <script>
+    (function () {
+      var stored = localStorage.getItem("medbridge-theme");
+      var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <script>
+    (function () {
+      var session = null;
+      try { session = JSON.parse(localStorage.getItem("medbridge-auth")); } catch (e) {}
+      if (!session || !session.username) {
+        window.location.replace("login.html");
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -74,101 +90,229 @@
       </header>
 
       <!-- Page Content -->
-      <main class="content">
-        <div class="card card--stats" style="margin-bottom: 20px;">
+      <main class="content" id="remindersPage">
+        <!-- Stats -->
+        <section class="card card--stats" style="margin-bottom: 20px;">
           <div class="card__header">
-            <h2 class="card__title">This Week</h2>
+            <h2 class="card__title">Overview</h2>
           </div>
-          <div class="stats">
+          <div class="stats stats--5">
             <div class="stat">
-              <p class="stat__value">86%</p>
-              <p class="stat__label">Adherence Rate</p>
+              <p class="stat__value" id="statTotal">0</p>
+              <p class="stat__label">Total Reminders</p>
             </div>
             <div class="stat">
-              <p class="stat__value" id="takenTodayStat">0</p>
-              <p class="stat__label">Taken Today</p>
+              <p class="stat__value" id="statActive">0</p>
+              <p class="stat__label">Active</p>
             </div>
             <div class="stat">
-              <p class="stat__value stat__value--danger">1</p>
-              <p class="stat__label">Missed This Week</p>
+              <p class="stat__value" id="statCompleted">0</p>
+              <p class="stat__label">Completed Today</p>
+            </div>
+            <div class="stat">
+              <p class="stat__value stat__value--danger" id="statMissed">0</p>
+              <p class="stat__label">Missed Today</p>
+            </div>
+            <div class="stat">
+              <p class="stat__value" id="statUpcoming">0</p>
+              <p class="stat__label">Upcoming Today</p>
             </div>
           </div>
-        </div>
+        </section>
 
+        <!-- Today's schedule -->
+        <section class="card" style="margin-bottom: 20px;">
+          <div class="card__header">
+            <h2 class="card__title">Today's Schedule</h2>
+          </div>
+          <ul class="schedule-list" id="scheduleList"></ul>
+          <div class="placeholder-state" id="scheduleEmpty" hidden>
+            <span class="placeholder-state__icon">⏰</span>
+            <p>Nothing scheduled for today.</p>
+          </div>
+        </section>
+
+        <!-- Toolbar -->
         <div class="page-actions">
-          <div class="segmented" id="tabs">
-            <button class="segmented__option active" data-tab="today">Today</button>
-            <button class="segmented__option" data-tab="upcoming">Upcoming</button>
-            <button class="segmented__option" data-tab="history">History</button>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; flex: 1;">
+            <div class="search-input-wrap">
+              <span class="search-input-wrap__icon">🔍</span>
+              <input type="text" class="form-input" id="searchInput" placeholder="Search reminders…" />
+            </div>
+            <select class="form-select" id="filterSelect" style="width: auto;">
+              <option value="all">All Reminders</option>
+              <option value="active">Active</option>
+              <option value="today">Scheduled Today</option>
+              <option value="completed">Completed Today</option>
+              <option value="missed">Missed Today</option>
+              <option value="high-priority">High Priority</option>
+            </select>
+            <select class="form-select" id="sortSelect" style="width: auto;">
+              <option value="time">Sort by Time</option>
+              <option value="name">Sort by Name</option>
+              <option value="priority">Sort by Priority</option>
+              <option value="frequency">Sort by Frequency</option>
+            </select>
           </div>
           <button class="btn btn--primary" id="addReminderBtn">+ Add Reminder</button>
         </div>
 
+        <!-- Reminder cards -->
+        <section class="card" style="margin-bottom: 20px;">
+          <div class="card__header">
+            <h2 class="card__title">All Reminders</h2>
+          </div>
+          <div class="reminder-cards" id="reminderCards" hidden></div>
+          <div class="placeholder-state" id="reminderCardsEmpty" hidden>
+            <span class="placeholder-state__icon">💊</span>
+            <p>No reminders yet. Add your first one to get started.</p>
+          </div>
+        </section>
+
+        <!-- Calendar -->
         <section class="card">
           <div class="card__header">
-            <h2 class="card__title" id="listTitle">Today</h2>
+            <h2 class="card__title">Calendar</h2>
           </div>
-          <ul class="reminder-list" id="reminderList"></ul>
-          <div class="placeholder-state" id="emptyState" hidden>
-            <span class="placeholder-state__icon">⏰</span>
-            <p>Nothing here yet.</p>
+
+          <div class="calendar-nav">
+            <button type="button" class="icon-btn" id="calPrevBtn" aria-label="Previous month">‹</button>
+            <span class="calendar-nav__label" id="calendarMonthLabel"></span>
+            <button type="button" class="icon-btn" id="calNextBtn" aria-label="Next month">›</button>
+          </div>
+
+          <div class="calendar" id="calendarGrid"></div>
+
+          <div class="calendar-day-detail" id="calendarDayDetail" hidden>
+            <h4 class="calendar-day-detail__title" id="calendarDayTitle"></h4>
+            <ul class="calendar-day-detail__list" id="calendarDayList"></ul>
           </div>
         </section>
       </main>
     </div>
   </div>
 
-  <!-- Add Reminder Modal -->
-  <div class="modal-overlay" id="reminderModalOverlay">
+  <!-- Add / Edit Reminder Modal -->
+  <div class="modal-overlay" id="reminderModalOverlay" hidden>
     <div class="modal">
       <div class="modal__header">
-        <h3 class="modal__title">Add Reminder</h3>
-        <button class="modal__close" id="modalClose" aria-label="Close">&times;</button>
+        <h3 class="modal__title" id="reminderModalTitle">Add Reminder</h3>
+        <button class="modal__close" id="reminderModalClose" aria-label="Close">&times;</button>
       </div>
 
       <form class="modal__body" id="reminderForm">
+        <input type="hidden" id="reminderId" />
+
         <div class="form-group">
-          <label class="form-label" for="reminderMed">Medication</label>
-          <select class="form-select" id="reminderMed">
-            <option>Metformin — 500mg</option>
-            <option>Ibuprofen — 200mg</option>
-            <option>Warfarin — 5mg</option>
+          <label class="form-label" for="fieldName">Medicine Name</label>
+          <input type="text" class="form-input" id="fieldName" />
+          <span class="field-error" id="errorName"></span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="fieldDosage">Dosage</label>
+            <input type="text" class="form-input" id="fieldDosage" placeholder="e.g. 500mg" />
+            <span class="field-error" id="errorDosage"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fieldTime">Reminder Time</label>
+            <input type="time" class="form-input" id="fieldTime" />
+            <span class="field-error" id="errorTime"></span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="fieldFrequency">Frequency</label>
+            <select class="form-select" id="fieldFrequency">
+              <option value="daily" selected>Daily</option>
+              <option value="twice-daily">Twice Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fieldMealTiming">Meal Timing</label>
+            <select class="form-select" id="fieldMealTiming">
+              <option value="before">Before Food</option>
+              <option value="after" selected>After Food</option>
+              <option value="with">With Food</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" id="customFrequencyRow" hidden>
+          <label class="form-label" for="fieldCustomFrequency">Custom Frequency Description</label>
+          <input type="text" class="form-input" id="fieldCustomFrequency" placeholder="e.g. Every other day" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="fieldStartDate">Start Date</label>
+            <input type="date" class="form-input" id="fieldStartDate" />
+            <span class="field-error" id="errorStartDate"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fieldEndDate">End Date (optional)</label>
+            <input type="date" class="form-input" id="fieldEndDate" />
+            <span class="field-error" id="errorEndDate"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fieldPriority">Priority</label>
+          <select class="form-select" id="fieldPriority">
+            <option value="normal" selected>Normal</option>
+            <option value="important">Important</option>
+            <option value="critical">Critical</option>
           </select>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label" for="reminderTime">Time</label>
-            <input type="time" class="form-input" id="reminderTime" value="08:00" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="reminderDay">Day</label>
-            <select class="form-select" id="reminderDay">
-              <option value="Today">Today</option>
-              <option value="Tomorrow">Tomorrow</option>
+            <label class="form-label" for="fieldNotifyOffset">Notify Me</label>
+            <select class="form-select" id="fieldNotifyOffset">
+              <option value="0">At the time of the dose</option>
+              <option value="5" selected>5 minutes before</option>
+              <option value="custom">Custom…</option>
             </select>
+          </div>
+          <div class="form-group" id="customOffsetField" hidden>
+            <label class="form-label" for="fieldCustomOffset">Minutes before</label>
+            <input type="number" class="form-input" id="fieldCustomOffset" min="1" max="180" value="10" />
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="reminderNotes">Notes</label>
-          <input type="text" class="form-input" id="reminderNotes" placeholder="e.g. Take with food" />
+          <label class="form-label" for="fieldNotes">Notes</label>
+          <textarea class="form-textarea" id="fieldNotes" placeholder="Optional notes about this reminder"></textarea>
+        </div>
+
+        <div class="toggle-row" style="border-bottom: none; padding-bottom: 0;">
+          <div>
+            <p class="toggle-row__label">Enabled</p>
+            <p class="toggle-row__desc">Turn off to pause this reminder without deleting it.</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="fieldEnabled" checked />
+            <span class="toggle__track"></span>
+          </label>
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn btn--secondary" id="modalCancel">Cancel</button>
-          <button type="submit" class="btn btn--primary">Add Reminder</button>
+          <button type="button" class="btn btn--secondary" id="reminderCancelBtn">Cancel</button>
+          <button type="submit" class="btn btn--primary">Save Reminder</button>
         </div>
       </form>
     </div>
   </div>
 
-  <div class="toast" id="toast">
-    <span class="toast__icon">✅</span>
-    <span id="toastMessage">Saved</span>
-  </div>
+  <div class="toast" id="toast"></div>
 
   <script src="js/script.js"></script>
-  <script src="js/reminders.js"></script>
+  <script src="js/reminder.js"></script>
+  <script src="js/theme.js"></script>
 </body>
 </html>
