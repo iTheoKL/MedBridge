@@ -1,217 +1,171 @@
-/*
-  report.js — populates report.html with consultation report data and
-  wires up the page's common actions (print, back navigation).
+document.addEventListener("DOMContentLoaded", () => {
+  // Canonical medication list — keep this in sync with js/medications.js.
+  const MEDICATIONS = [
+    { name: "Metformin", dosage: "500mg", frequency: "Twice daily", doctor: "Dr. Amara Chen" },
+    { name: "Ibuprofen", dosage: "200mg", frequency: "As needed", doctor: "Dr. Priya Nair" },
+    { name: "Warfarin", dosage: "5mg", frequency: "Once daily", doctor: "Dr. Miguel Ortiz" },
+    { name: "Paracetamol", dosage: "500mg", frequency: "Three times daily", doctor: "Dr. Sarah Kim" },
+    { name: "Aspirin", dosage: "400mg", frequency: "Twice daily", doctor: "Dr. James Okafor" },
+  ];
 
-  To connect this to live data later, replace the body of
-  getReportData() with a fetch() call to your backend/API — none of
-  the render functions below need to change as a result.
-*/
-
-document.addEventListener('DOMContentLoaded', init);
-
-async function init() {
-  const data = await getReportData();
-  renderReport(data);
-  wireUpActions();
-}
-
-// ---------------------------------------------------------------------
-// Data
-// ---------------------------------------------------------------------
-
-async function getReportData() {
-  // Sample data mirroring a generated consultation report.
-  // Swap this for: return await fetch('/api/reports/<id>').then(r => r.json());
-  return {
-    patient: {
-      name: 'John Doe',
-      age: 68,
-      gender: 'Male',
-      bloodGroup: 'O+',
-      phone: '+91 9876543210'
-    },
-    medications: [
-      { name: 'Metformin', dose: '500 mg', frequency: 'Morning', status: 'ACTIVE' },
-      { name: 'Warfarin', dose: '5 mg', frequency: 'Night', status: 'ACTIVE' }
-    ],
-    adherence: {
-      taken: 28,
-      missed: 2,
-      percent: 93
-    },
-    symptoms: ['Dizziness', 'Nausea'],
-    interaction: {
-      severity: 'High',
-      details: [
-        'Risk of increased bleeding.'
-      ]
-    },
-    caregiver: {
-      name: 'David Doe',
-      relationship: 'Son',
-      alert: 'No Alerts'
-    },
-    aiRecommendation: 'Based on the available data, the patient has 93% medication adherence. A High drug interaction has been detected. Please consult the treating physician before making any medication changes.'
+  const ADHERENCE = {
+    period: "Last 30 days",
+    takenPercent: 95,
+    taken: 256,
+    missed: 14,
+    totalDoses: 270,
   };
-}
 
-// ---------------------------------------------------------------------
-// Rendering
-// ---------------------------------------------------------------------
+  const SYMPTOM_NOTES = [
+    { symptom: "Nausea", relatedTo: "Metformin, Ibuprofen, Warfarin, Paracetamol, Aspirin" },
+    { symptom: "Stomach pain", relatedTo: "Metformin, Ibuprofen, Aspirin" },
+    { symptom: "Easy bruising / bleeding risk", relatedTo: "Warfarin, Aspirin" },
+    { symptom: "Fatigue", relatedTo: "Metformin, Warfarin" },
+  ];
 
-function renderReport(data) {
-  renderPatient(data.patient);
-  renderMedications(data.medications);
-  renderAdherence(data.adherence);
-  renderSymptoms(data.symptoms);
-  renderInteraction(data.interaction);
-  renderCaregiver(data.caregiver);
-  renderRecommendation(data.aiRecommendation);
-  renderTimestamp();
-}
+  // Kept in sync with the interaction list shown on index.html.
+  const INTERACTIONS = [
+    { pair: "Warfarin + Ibuprofen", severity: "High", note: "Increased bleeding potential." },
+    { pair: "Warfarin + Aspirin", severity: "High", note: "Increased bleeding potential." },
+    { pair: "Aspirin + Ibuprofen", severity: "Moderate", note: "Increased gastrointestinal bleeding risk." },
+    { pair: "Metformin + Ibuprofen", severity: "Moderate", note: "Monitor kidney function." },
+    { pair: "Metformin + Warfarin", severity: "None", note: "No known interaction." },
+  ];
 
-function renderPatient(patient) {
-  setText('patientName', patient.name);
-  setText('patientAge', patient.age);
-  setText('patientGender', patient.gender);
-  setText('patientBloodGroup', patient.bloodGroup);
-  setText('patientPhone', patient.phone);
-}
+  const medTableBody = document.getElementById("reportMedTableBody");
+  const fromDate = document.getElementById("fromDate");
+  const toDate = document.getElementById("toDate");
+  const reportForm = document.getElementById("reportForm");
+  const recentReports = document.getElementById("recentReports");
 
-function renderMedications(meds) {
-  const tbody = document.getElementById('medsTableBody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  (meds || []).forEach(med => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${escapeHtml(med.name)}</td>
-      <td>${escapeHtml(med.dose)}</td>
-      <td>${escapeHtml(med.frequency)}</td>
-      <td><span class="badge ${statusBadgeClass(med.status)}">${escapeHtml(med.status)}</span></td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-
-function statusBadgeClass(status) {
-  switch ((status || '').toUpperCase()) {
-    case 'ACTIVE': return 'badge-active';
-    case 'PAUSED': return 'badge-paused';
-    case 'STOPPED': return 'badge-stopped';
-    default: return 'badge-default';
-  }
-}
-
-function renderAdherence(adherence) {
-  if (!adherence) return;
-  setText('adherenceTaken', adherence.taken);
-  setText('adherenceMissed', adherence.missed);
-  setText('adherencePercent', `${adherence.percent}%`);
-  const fill = document.getElementById('adherenceBarFill');
-  if (fill) {
-    const pct = Math.min(100, Math.max(0, Number(adherence.percent) || 0));
-    fill.style.width = `${pct}%`;
-    fill.classList.toggle('adherence-bar__fill--warn', pct < 80);
-  }
-}
-
-function renderSymptoms(symptoms) {
-  const list = document.getElementById('symptomsList');
-  if (!list) return;
-  list.innerHTML = '';
-  if (!symptoms || symptoms.length === 0) {
-    const li = document.createElement('li');
-    li.className = 'symptom-chip';
-    li.textContent = 'No symptoms reported';
-    list.appendChild(li);
-    return;
-  }
-  symptoms.forEach(symptom => {
-    const li = document.createElement('li');
-    li.className = 'symptom-chip';
-    li.textContent = symptom;
-    list.appendChild(li);
-  });
-}
-
-function renderInteraction(interaction) {
-  const badge = document.getElementById('interactionSeverityBadge');
-  const list = document.getElementById('interactionDetailsList');
-  if (!interaction) return;
-
-  const severity = interaction.severity || 'None';
-  if (badge) {
-    badge.textContent = severity;
-    badge.className = `severity-badge ${severityBadgeClass(severity)}`;
+  // ---------------------------------------------------------------------
+  // Show the data the report will be built from
+  // ---------------------------------------------------------------------
+  function renderMedications() {
+    if (!medTableBody) return;
+    medTableBody.innerHTML = MEDICATIONS.map(
+      (med) => `
+        <tr>
+          <td class="table__primary">${med.name}</td>
+          <td class="table__secondary">${med.dosage}</td>
+          <td class="table__secondary">${med.frequency}</td>
+          <td class="table__secondary">${med.doctor}</td>
+        </tr>
+      `
+    ).join("");
   }
 
-  if (list) {
-    list.innerHTML = '';
-    const details = (interaction.details || []).filter(Boolean);
-    if (details.length === 0) {
-      const li = document.createElement('li');
-      li.textContent = 'No additional details provided.';
-      list.appendChild(li);
+  // Default range: start of this month -> today
+  const today = new Date();
+  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  toDate.value = today.toISOString().split("T")[0];
+  fromDate.value = startOfMonth.toISOString().split("T")[0];
+
+  // ---------------------------------------------------------------------
+  // Build the downloadable report
+  // ---------------------------------------------------------------------
+  function buildReportText(sections, from, to) {
+    const lines = [];
+    lines.push("MedBridge Health Report");
+    lines.push(`Period: ${from} to ${to}`);
+    lines.push(`Generated: ${new Date().toLocaleString()}`);
+    lines.push("=".repeat(48));
+
+    if (sections.includes("medications")) {
+      lines.push("\nMEDICATIONS LIST");
+      lines.push("-".repeat(48));
+      MEDICATIONS.forEach((med) => {
+        lines.push(`${med.name} — ${med.dosage} — ${med.frequency} — Prescribed by ${med.doctor}`);
+      });
+    }
+
+    if (sections.includes("reminders")) {
+      lines.push("\nREMINDER HISTORY & ADHERENCE");
+      lines.push("-".repeat(48));
+      lines.push(
+        `${ADHERENCE.period}: ${ADHERENCE.takenPercent}% adherence ` +
+          `(${ADHERENCE.taken} taken, ${ADHERENCE.missed} missed of ${ADHERENCE.totalDoses} scheduled doses)`
+      );
+    }
+
+    if (sections.includes("symptoms")) {
+      lines.push("\nSYMPTOM LOG");
+      lines.push("-".repeat(48));
+      SYMPTOM_NOTES.forEach((entry) => {
+        lines.push(`${entry.symptom} — possibly related to: ${entry.relatedTo}`);
+      });
+    }
+
+    if (sections.includes("interactions")) {
+      lines.push("\nDRUG INTERACTION WARNINGS");
+      lines.push("-".repeat(48));
+      INTERACTIONS.forEach((entry) => {
+        lines.push(`${entry.pair} — ${entry.severity} risk — ${entry.note}`);
+      });
+    }
+
+    lines.push("\n" + "=".repeat(48));
+    lines.push(
+      "This report was generated automatically by MedBridge and is not a substitute for professional medical advice."
+    );
+
+    return lines.join("\n");
+  }
+
+  reportForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const sections = Array.from(reportForm.querySelectorAll("input[type='checkbox']:checked")).map(
+      (input) => input.value
+    );
+
+    if (sections.length === 0) {
+      showToast("Select at least one section to include");
       return;
     }
-    details.forEach(detail => {
-      const li = document.createElement('li');
-      li.textContent = detail;
-      list.appendChild(li);
-    });
+
+    const from = fromDate.value || "N/A";
+    const to = toDate.value || "N/A";
+    const reportText = buildReportText(sections, from, to);
+
+    // Actually trigger a real file download — no server involved.
+    const blob = new Blob([reportText], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const filename = `medbridge-report-${from}-to-${to}.txt`;
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    addToRecentReports(from, to);
+    showToast("Report downloaded");
+  });
+
+  function addToRecentReports(from, to) {
+    const item = document.createElement("li");
+    item.className = "report-item";
+    item.innerHTML = `
+      <span class="report-item__icon">📄</span>
+      <div class="report-item__body">
+        <p class="report-item__name">Health Report — ${from} to ${to}</p>
+        <p class="report-item__meta">Generated just now</p>
+      </div>
+      <button class="icon-btn" aria-label="Download" disabled>⬇</button>
+    `;
+    recentReports.prepend(item);
   }
-}
 
-function severityBadgeClass(severity) {
-  switch ((severity || '').toLowerCase()) {
-    case 'high': return 'severity-badge--high';
-    case 'medium': return 'severity-badge--medium';
-    case 'low': return 'severity-badge--low';
-    default: return 'severity-badge--none';
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    const toastMessage = document.getElementById("toastMessage");
+    toastMessage.textContent = message;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2800);
   }
-}
 
-function renderCaregiver(caregiver) {
-  if (!caregiver) return;
-  setText('caregiverName', caregiver.name);
-  setText('caregiverRelationship', caregiver.relationship);
-  setText('caregiverAlert', caregiver.alert);
-}
-
-function renderRecommendation(text) {
-  setText('aiRecommendationText', text);
-}
-
-function renderTimestamp() {
-  const el = document.getElementById('reportGeneratedAt');
-  if (el) {
-    el.textContent = `Generated on ${new Date().toLocaleString()}`;
-  }
-}
-
-// ---------------------------------------------------------------------
-// Common page actions
-// ---------------------------------------------------------------------
-
-function wireUpActions() {
-  const printBtn = document.getElementById('printReportBtn');
-  if (printBtn) {
-    printBtn.addEventListener('click', () => window.print());
-  }
-}
-
-// ---------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------
-
-function setText(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = (value === undefined || value === null || value === '') ? '—' : value;
-}
-
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str ?? '';
-  return div.innerHTML;
-}
+  renderMedications();
+});
