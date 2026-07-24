@@ -1,5 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Canonical medication list — keep this in sync with js/medications.js.
+  // NOTE: this mirrors the canonical medication list in js/medications.js
+  // (the source of truth). js/symptoms.js keeps its own copy too. There's
+  // no shared module system across these plain <script> pages, so all
+  // three must be updated together whenever a medication is added,
+  // removed, or edited.
   const MEDICATIONS = [
     { name: "Metformin", dosage: "500mg", frequency: "Twice daily", doctor: "Dr. Amara Chen" },
     { name: "Ibuprofen", dosage: "200mg", frequency: "As needed", doctor: "Dr. Priya Nair" },
