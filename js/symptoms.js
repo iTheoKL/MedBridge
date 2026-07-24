@@ -42,6 +42,31 @@ document.addEventListener("DOMContentLoaded", () => {
         "nausea",
       ],
     },
+    {
+      name: "Paracetamol",
+      dose: "500mg",
+      sideEffects: [
+        "nausea",
+        "rash",
+        "loss of appetite",
+        "stomach pain",
+        "dark urine",
+        "yellowing of skin or eyes",
+      ],
+    },
+    {
+      name: "Aspirin",
+      dose: "400mg",
+      sideEffects: [
+        "stomach pain",
+        "heartburn",
+        "nausea",
+        "easy bruising",
+        "ringing in ears",
+        "dizziness",
+        "black stools",
+      ],
+    },
   ];
 
   const symptoms = [];
