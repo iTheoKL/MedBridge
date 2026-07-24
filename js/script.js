@@ -1,5 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+  // Show the actual logged-in user (set during login/registration) instead
+  // of the static placeholder markup.
+  let session = null;
+  try {
+    session = JSON.parse(localStorage.getItem("medbridge-auth"));
+  } catch (e) {
+    session = null;
+  }
+
+  if (session && session.username) {
+    const nameEl = document.querySelector(".user-menu__name");
+    const avatarEl = document.querySelector(".user-menu__avatar");
+
+    if (nameEl) nameEl.textContent = session.username;
+    if (avatarEl) {
+      avatarEl.textContent = session.username.slice(0, 2).toUpperCase();
+    }
+  }
+
   const trigger = document.getElementById("userMenuTrigger");
   const dropdown = document.getElementById("userMenuDropdown");
   const userMenu = document.getElementById("userMenu");
