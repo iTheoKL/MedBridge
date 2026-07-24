@@ -2,6 +2,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------------------------------------------------------------------
   // Mock data — in a real app this would come from the user's saved
   // medication list (see medications.html) and a proper drug database.
+  //
+  // NOTE: name/dose here are intentionally kept in sync with the
+  // canonical list in js/medications.js (and js/report.js). There's no
+  // shared module system across these plain <script> pages, so if you
+  // add/remove/edit a medication in js/medications.js, update the
+  // sideEffects list here too.
   // ---------------------------------------------------------------------
   const currentMedications = [
     {
