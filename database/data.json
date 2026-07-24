@@ -1,0 +1,12 @@
+{
+    "dhina": {
+        "paracetamol": {
+            "frequency": ["13:00;00"],
+            "dosage": 500
+        },
+        "aspirin": {
+            "frequency": ["21:00:00"],
+            "dosage": 100
+        }
+    }
+}
