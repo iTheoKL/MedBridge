@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // User dropdown menu toggle
+
   const trigger = document.getElementById("userMenuTrigger");
   const dropdown = document.getElementById("userMenuDropdown");
   const userMenu = document.getElementById("userMenu");
