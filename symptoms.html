@@ -4,6 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MedBridge · Symptoms</title>
+  <script>
+    (function () {
+      var stored = localStorage.getItem("medbridge-theme");
+      var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <script>
+    (function () {
+      var session = null;
+      try { session = JSON.parse(localStorage.getItem("medbridge-auth")); } catch (e) {}
+      if (!session || !session.username) {
+        window.location.replace("login.html");
+      }
+    })();
+  </script>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -64,6 +80,83 @@
             <div class="user-menu__dropdown" id="userMenuDropdown">
               <a href="account.html" class="user-menu__item">
                 <span class="user-menu__item-icon">⚙️</span> Manage Account
+              </a>
+              <a href="logout.html" class="user-menu__item user-menu__item--danger">
+                <span class="user-menu__item-icon">🚪</span> Log Out
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <main class="content">
+        <div class="grid">
+          <!-- Symptom Checker -->
+          <section class="card">
+            <div class="card__header">
+              <h2 class="card__title">Symptom Checker</h2>
+            </div>
+            <p class="card__subtitle">
+              Enter one or more symptoms you're experiencing. We'll check whether they match known side
+              effects of your current medications.
+            </p>
+
+            <form class="symptom-form" id="symptomForm">
+              <div class="symptom-input-row">
+                <input
+                  type="text"
+                  id="symptomInput"
+                  class="symptom-input"
+                  placeholder="e.g. nausea, headache, dizziness"
+                  autocomplete="off"
+                />
+                <button type="submit" class="btn btn--secondary" id="addSymptomBtn">Add</button>
+              </div>
+
+              <div class="symptom-chips" id="symptomChips"></div>
+              <p class="empty-hint" id="emptyHint">No symptoms added yet. Type a symptom and press Add or Enter.</p>
+
+              <button type="button" class="btn btn--primary btn--full" id="checkSymptomsBtn" disabled>
+                Check Symptoms
+              </button>
+            </form>
+          </section>
+
+          <!-- Medication Reference -->
+          <section class="card">
+            <div class="card__header">
+              <h2 class="card__title">Your Current Medications</h2>
+              <a href="medications.html" class="card__link">Manage medications</a>
+            </div>
+            <p class="card__subtitle">Known side effects we check your symptoms against.</p>
+
+            <div class="med-reference-grid" id="medReference"></div>
+          </section>
+        </div>
+
+        <!-- Results -->
+        <section class="card" style="margin-top: 20px;">
+          <div class="card__header">
+            <h2 class="card__title">Results</h2>
+          </div>
+
+          <div class="placeholder-state" id="resultsPlaceholder">
+            <span class="placeholder-state__icon">🔍</span>
+            <p>Add symptoms above and click "Check Symptoms" to see results here.</p>
+          </div>
+
+          <div class="results" id="results" hidden></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script src="js/symptoms.js"></script>
+  <script src="js/theme.js"></script>
+</body>
+</html>
               </a>
               <a href="logout.html" class="user-menu__item user-menu__item--danger">
                 <span class="user-menu__item-icon">🚪</span> Log Out
