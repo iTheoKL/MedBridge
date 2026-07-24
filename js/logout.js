@@ -1,4 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Actually clear the session so the user is really logged out — visiting
+  // any protected page (or hitting back/forward) now bounces to login.html.
+  localStorage.removeItem("medbridge-auth");
+
   const countdownEl = document.getElementById("countdown");
   let secondsLeft = 5;
 
@@ -6,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     secondsLeft -= 1;
     if (secondsLeft <= 0) {
       clearInterval(interval);
-      window.location.href = "index.html";
+      window.location.href = "login.html";
       return;
     }
     countdownEl.textContent = secondsLeft;
