@@ -1,0 +1,6 @@
+drug1,drug2,severity,gap_hours,reason
+iron,calcium,Moderate,2,Calcium reduces iron absorption
+aspirin,ibuprofen,High,0,Increased bleeding risk
+paracetamol,alcohol,Moderate,0,May increase liver toxicity
+metformin,alcohol,High,0,Risk of lactic acidosis
+levothyroxine,calcium,High,4,Calcium reduces levothyroxine absorption
