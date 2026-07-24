@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedBridge · OCR Scan</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================= */
+    /* OCR Scan Page (page-specific)  */
+    /* ============================= */
+
+    .ocr-card__hint {
+      margin: 0 0 18px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      padding: 10px 18px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease, transform 0.05s ease;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .btn--primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn--primary:hover:not(:disabled) {
+      background: #2559c9;
+    }
+
+    .btn--secondary {
+      background: var(--sidebar-bg);
+      color: #fff;
+    }
+
+    .btn--secondary:hover:not(:disabled) {
+      background: var(--sidebar-bg-active);
+    }
+
+    .btn--outline {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text-primary);
+    }
+
+    .btn--outline:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: #d6dbe6;
+    }
+
+    /* Upload actions */
+    .ocr-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    /* Image preview */
+    .ocr-preview {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 20px;
+      padding: 16px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+    }
+
+    .ocr-preview img {
+      max-width: 220px;
+      max-height: 220px;
+      border-radius: 10px;
+      object-fit: contain;
+      background: #fff;
+      border: 1px solid var(--border);
+    }
+
+    .ocr-preview__actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Status / spinner */
+    .ocr-status {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Raw OCR results */
+    .ocr-raw-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ocr-raw-list li {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+
+    /* Verify form */
+    .verify-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 480px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .form-group input {
+      font-family: inherit;
+      font-size: 14px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text-primary);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(47, 111, 235, 0.15);
+    }
+
+    .checkbox-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .checkbox-field input {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .verify-form__actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    /* Save success banner */
+    .ocr-save-success {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-radius: var(--radius);
+      background: var(--success-bg);
+      border: 1px solid rgba(46, 174, 98, 0.25);
+      color: #1d6b3e;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* Error banner */
+    .ocr-error {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
+      border-radius: var(--radius);
+      background: var(--danger-bg);
+      border: 1px solid rgba(229, 72, 77, 0.25);
+      color: var(--danger);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Camera modal */
+    .camera-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 15, 30, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .camera-modal[hidden] {
+      display: none;
+    }
+
+    .camera-modal__box {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 20px 48px rgba(16, 24, 40, 0.25);
+    }
+
+    .camera-modal__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .camera-modal__header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .camera-modal__close {
+      background: transparent;
+      border: none;
+      font-size: 22px;
+      line-height: 1;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .camera-modal video {
+      width: 100%;
+      border-radius: 10px;
+      background: #000;
+      max-height: 60vh;
+    }
+
+    .camera-modal__actions {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Side Menu -->
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <span class="sidebar__logo">🩺</span>
+        <span class="sidebar__title">MedBridge</span>
+      </div>
+
+      <nav class="sidebar__nav">
+        <a href="ocr.html" class="nav-item" data-page="ocr">
+          <span class="nav-item__icon">📷</span>
+          <span class="nav-item__label">OCR Scan</span>
+        </a>
+        <a href="medications.html" class="nav-item" data-page="medications">
+          <span class="nav-item__icon">💊</span>
+          <span class="nav-item__label">List of Medications</span>
+        </a>
+        <a href="reminders.html" class="nav-item" data-page="reminders">
+          <span class="nav-item__icon">⏰</span>
+          <span class="nav-item__label">Reminders</span>
+        </a>
+        <a href="report.html" class="nav-item" data-page="report">
+          <span class="nav-item__icon">📄</span>
+          <span class="nav-item__label">Download Report</span>
+        </a>
+        <a href="symptoms.html" class="nav-item" data-page="symptoms">
+          <span class="nav-item__icon">🩹</span>
+          <span class="nav-item__label">Symptoms</span>
+        </a>
+      </nav>
+
+      <div class="sidebar__footer">
+        <p>&copy; 2026 MedBridge</p>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar__left">
+          <h1 class="topbar__title">OCR Scan</h1>
+        </div>
+
+        <div class="topbar__right">
+          <div class="user-menu" id="userMenu">
+            <button class="user-menu__trigger" id="userMenuTrigger" aria-haspopup="true" aria-expanded="false">
+              <span class="user-menu__avatar">JD</span>
+              <span class="user-menu__name">Jane Doe</span>
+              <span class="user-menu__caret">▾</span>
+            </button>
+
+            <div class="user-menu__dropdown" id="userMenuDropdown">
+              <a href="account.html" class="user-menu__item">
+                <span class="user-menu__item-icon">⚙️</span> Manage Account
+              </a>
+              <a href="logout.html" class="user-menu__item user-menu__item--danger">
+                <span class="user-menu__item-icon">🚪</span> Log Out
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <main class="content">
+
+        <!-- Step 1: Choose or take image -->
+        <section class="card ocr-card">
+          <div class="card__header">
+            <h2 class="card__title">Scan Medicine Label</h2>
+          </div>
+          <p class="ocr-card__hint">
+            Choose a photo of the medicine packaging from your device, or take a picture using your camera.
+            MedBridge will run OCR and try to detect the medicine name, generic name, and dosage automatically.
+          </p>
+
+          <div class="ocr-actions">
+            <button type="button" class="btn btn--primary" id="chooseImageBtn">
+              <span>📁</span> Choose Image
+            </button>
+            <button type="button" class="btn btn--secondary" id="takePhotoBtn">
+              <span>📷</span> Take Photo
+            </button>
+            <input type="file" id="fileInput" accept="image/*" hidden />
+          </div>
+
+          <div class="ocr-preview" id="ocrPreview" hidden>
+            <img id="previewImage" alt="Selected medicine label preview" />
+            <div class="ocr-preview__actions">
+              <button type="button" class="btn btn--outline" id="removeImageBtn">Remove Image</button>
+              <button type="button" class="btn btn--primary" id="runOcrBtn">Run OCR</button>
+            </div>
+          </div>
+
+          <div class="ocr-status" id="ocrStatus" hidden>
+            <span class="spinner"></span>
+            <span id="ocrStatusText">Processing image…</span>
+          </div>
+
+          <div class="ocr-error" id="ocrError" hidden></div>
+        </section>
+
+        <!-- Step 2: Raw OCR output -->
+        <section class="card" id="rawResultsCard" hidden>
+          <div class="card__header">
+            <h2 class="card__title">Raw OCR Output</h2>
+          </div>
+          <ul class="ocr-raw-list" id="rawOcrList"></ul>
+        </section>
+
+        <!-- Step 3: Verify & save -->
+        <section class="card" id="verifyCard" hidden>
+          <div class="card__header">
+            <h2 class="card__title">Verify Medicine Details</h2>
+          </div>
+          <p class="ocr-card__hint">
+            OCR can misread labels. Please check the fields below and correct anything that looks wrong
+            before saving.
+          </p>
+
+          <form class="verify-form" id="verifyForm">
+            <div class="form-group">
+              <label for="medicineName">Medicine Name</label>
+              <input type="text" id="medicineName" name="medicineName" placeholder="e.g. Dolo-650" autocomplete="off" />
+            </div>
+
+            <div class="form-group">
+              <label for="genericName">Generic Name</label>
+              <input type="text" id="genericName" name="genericName" placeholder="e.g. Paracetamol Tablets IP" autocomplete="off" />
+            </div>
+
+            <div class="form-group">
+              <label for="dosage">Dosage</label>
+              <input type="text" id="dosage" name="dosage" placeholder="e.g. 650mg" autocomplete="off" />
+            </div>
+
+            <label class="checkbox-field">
+              <input type="checkbox" id="confirmCheckbox" />
+              <span>I have checked these details and confirm they are correct</span>
+            </label>
+
+            <div class="verify-form__actions">
+              <button type="button" class="btn btn--outline" id="startOverBtn">Start Over</button>
+              <button type="submit" class="btn btn--primary" id="saveBtn" disabled>✅ Verify &amp; Save</button>
+            </div>
+          </form>
+
+          <div class="ocr-save-success" id="saveSuccess" hidden></div>
+          <div class="ocr-error" id="saveError" hidden></div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Camera Modal -->
+  <div class="camera-modal" id="cameraModal" hidden>
+    <div class="camera-modal__box">
+      <div class="camera-modal__header">
+        <h3>Take a Photo</h3>
+        <button type="button" class="camera-modal__close" id="closeCameraBtn" aria-label="Close camera">&times;</button>
+      </div>
+      <video id="cameraStream" autoplay playsinline muted></video>
+      <canvas id="cameraCanvas" hidden></canvas>
+      <div class="camera-modal__actions">
+        <button type="button" class="btn btn--primary" id="captureBtn">📸 Capture</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script src="js/ocr.js"></script>
+</body>
+</html>
