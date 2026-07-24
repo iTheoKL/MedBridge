@@ -3,6 +3,7 @@
   --bg: #f5f5f7;
   --surface: #ffffff;
   --sidebar-bg: #fbfbfd;
+  --topbar-bg: rgba(255, 255, 255, 0.78);
 
   /* Borders */
   --border: #e8e8ed;
@@ -22,10 +23,18 @@
   /* Status */
   --danger: #ff3b30;
   --danger-tint: #ffefed;
+  --danger-text: #8a2f28;
   --warning: #ff9500;
   --warning-tint: #fff3e2;
+  --warning-text: #b8630a;
   --success: #34c759;
   --success-tint: #e9f9ee;
+  --success-text: #1f7a3d;
+
+  /* Inverse (used for elements that stay dark/light regardless of theme) */
+  --inverse-surface: #1d1d1f;
+  --inverse-text: #ffffff;
+  --tag-bg: rgba(0, 0, 0, 0.06);
 
   /* Radii */
   --radius-lg: 20px;
@@ -47,10 +56,73 @@
   --card-bg: var(--surface);
   --radius: var(--radius-lg);
   --shadow: var(--shadow-sm);
+
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  /* Surfaces */
+  --bg: #000000;
+  --surface: #1c1c1e;
+  --sidebar-bg: #111113;
+  --topbar-bg: rgba(20, 20, 22, 0.72);
+
+  /* Borders */
+  --border: #38383a;
+  --border-strong: #48484a;
+
+  /* Text */
+  --text-primary: #f5f5f7;
+  --text-secondary: #98989d;
+  --text-tertiary: #86868b;
+
+  /* Accent */
+  --primary: #0a84ff;
+  --primary-hover: #409cff;
+  --primary-active: #0060c2;
+  --primary-tint: rgba(10, 132, 255, 0.18);
+
+  /* Status */
+  --danger: #ff453a;
+  --danger-tint: rgba(255, 69, 58, 0.18);
+  --danger-text: #ffb4ab;
+  --warning: #ff9f0a;
+  --warning-tint: rgba(255, 159, 10, 0.18);
+  --warning-text: #ffbd5c;
+  --success: #30d158;
+  --success-tint: rgba(48, 209, 88, 0.18);
+  --success-text: #8fe6a8;
+
+  /* Inverse */
+  --inverse-surface: #2c2c2e;
+  --inverse-text: #ffffff;
+  --tag-bg: rgba(255, 255, 255, 0.12);
+
+  /* Shadows (darker, since the base surface is already black) */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 8px 28px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 16px 44px rgba(0, 0, 0, 0.6);
+
+  color-scheme: dark;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/*
+ * Several component classes below (.modal__body, .scan-preview,
+ * .scanning-indicator, .form-group, .reminder-cards, etc.) set an
+ * unconditional `display` value for layout purposes. Author styles
+ * always win over the browser's default `[hidden] { display: none }`
+ * rule regardless of specificity, so without this, toggling an
+ * element's `hidden` property/attribute from JS would silently fail
+ * to actually hide it. This restores the native, expected behavior
+ * of `hidden` everywhere in the app.
+ */
+[hidden] {
+  display: none !important;
 }
 
 html {
@@ -66,6 +138,7 @@ body {
   font-size: 15px;
   line-height: 1.5;
   letter-spacing: -0.01em;
+  transition: background-color 0.3s var(--ease), color 0.3s var(--ease);
 }
 
 h1, h2, h3, h4 {
@@ -93,6 +166,7 @@ a {
   display: flex;
   flex-direction: column;
   padding: 20px 14px;
+  transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease);
 }
 
 .sidebar__brand {
@@ -160,6 +234,12 @@ a {
 .nav-item:nth-child(4) .nav-item__icon { background: #f2ecff; }
 .nav-item:nth-child(5) .nav-item__icon { background: #ffeaef; }
 
+:root[data-theme="dark"] .nav-item:nth-child(1) .nav-item__icon { background: rgba(10, 132, 255, 0.18); }
+:root[data-theme="dark"] .nav-item:nth-child(2) .nav-item__icon { background: rgba(48, 209, 88, 0.18); }
+:root[data-theme="dark"] .nav-item:nth-child(3) .nav-item__icon { background: rgba(255, 159, 10, 0.18); }
+:root[data-theme="dark"] .nav-item:nth-child(4) .nav-item__icon { background: rgba(191, 90, 242, 0.18); }
+:root[data-theme="dark"] .nav-item:nth-child(5) .nav-item__icon { background: rgba(255, 69, 58, 0.18); }
+
 .nav-item:hover {
   background: var(--border);
   color: var(--text-primary);
@@ -201,10 +281,11 @@ a {
   align-items: center;
   justify-content: space-between;
   padding: 16px 32px;
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--topbar-bg);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   border-bottom: 1px solid var(--border);
+  transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease);
 }
 
 .topbar__title {
@@ -279,7 +360,8 @@ a {
   visibility: hidden;
   transform: translateY(-6px) scale(0.98);
   transform-origin: top right;
-  transition: opacity 0.2s var(--ease), transform 0.2s var(--ease-spring), visibility 0.2s var(--ease);
+  transition: opacity 0.2s var(--ease), transform 0.2s var(--ease-spring), visibility 0.2s var(--ease),
+    background-color 0.3s var(--ease), border-color 0.3s var(--ease);
   z-index: 20;
 }
 
@@ -357,7 +439,7 @@ a {
 .alert__text {
   margin: 0;
   font-size: 14px;
-  color: #8a2f28;
+  color: var(--danger-text);
   line-height: 1.55;
 }
 
@@ -401,7 +483,8 @@ a {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   padding: 22px;
-  transition: box-shadow 0.25s var(--ease), transform 0.25s var(--ease);
+  transition: box-shadow 0.25s var(--ease), transform 0.25s var(--ease),
+    background-color 0.3s var(--ease), border-color 0.3s var(--ease);
 }
 
 .card:hover {
@@ -515,7 +598,7 @@ a {
 
 .pill--warning {
   background: var(--warning-tint);
-  color: #b8630a;
+  color: var(--warning-text);
 }
 
 /* Interactions */
@@ -577,7 +660,7 @@ a {
   padding: 18px;
   border-radius: var(--radius-md);
   background: var(--bg);
-  transition: transform 0.2s var(--ease-spring);
+  transition: transform 0.2s var(--ease-spring), background-color 0.3s var(--ease);
 }
 
 .stat:hover {
@@ -681,7 +764,7 @@ a {
 .symptom-input:focus {
   outline: none;
   border-color: var(--primary);
-  background: #fff;
+  background: var(--surface);
   box-shadow: 0 0 0 4px var(--primary-tint);
 }
 
@@ -757,10 +840,6 @@ a {
   }
 }
 
-.results[hidden] {
-  display: none;
-}
-
 .result-group {
   border-radius: var(--radius-md);
   padding: 16px;
@@ -800,7 +879,7 @@ a {
 }
 
 .result-group__title--warning {
-  color: #b8630a;
+  color: var(--warning-text);
 }
 
 .result-group__title--new {
@@ -826,7 +905,7 @@ a {
   font-weight: 700;
   padding: 3px 11px;
   border-radius: var(--radius-pill);
-  background: rgba(0, 0, 0, 0.06);
+  background: var(--tag-bg);
 }
 
 .doctor-banner {
@@ -835,8 +914,9 @@ a {
   gap: 14px;
   padding: 18px 20px;
   border-radius: var(--radius-lg);
-  background: var(--text-primary);
-  color: #fff;
+  background: var(--inverse-surface);
+  color: var(--inverse-text);
+  transition: background-color 0.3s var(--ease);
 }
 
 .doctor-banner__icon {
@@ -865,8 +945,8 @@ a {
 }
 
 .doctor-banner .btn--primary {
-  background: #fff;
-  color: var(--text-primary);
+  background: var(--inverse-text);
+  color: var(--inverse-surface);
 }
 
 .doctor-banner .btn--primary:hover {
@@ -962,7 +1042,7 @@ a {
 
 .pill--success {
   background: var(--success-tint);
-  color: #1f7a3d;
+  color: var(--success-text);
 }
 
 .pill--muted {
@@ -1016,7 +1096,7 @@ a {
 .form-textarea:focus {
   outline: none;
   border-color: var(--primary);
-  background: #fff;
+  background: var(--surface);
   box-shadow: 0 0 0 4px var(--primary-tint);
 }
 
@@ -1271,11 +1351,22 @@ a {
   overflow-y: auto;
   padding: 24px;
   transform: translateY(12px) scale(0.98);
-  transition: transform 0.25s var(--ease-spring);
+  transition: transform 0.25s var(--ease-spring), background-color 0.3s var(--ease);
 }
 
 .modal-overlay.open .modal {
   transform: translateY(0) scale(1);
+}
+
+/* The camera modal (ocr.html) and the Add/Edit Reminder modal
+   (reminders.html) are shown/hidden via the native `hidden` attribute
+   rather than the `.open` class used by other modals — the global
+   `[hidden]` rule above handles hiding them; this just makes sure they
+   render at full opacity/visibility whenever `hidden` isn't set. */
+.modal-overlay.camera-modal,
+.modal-overlay#reminderModalOverlay {
+  opacity: 1;
+  visibility: visible;
 }
 
 .modal__header {
@@ -1321,8 +1412,8 @@ a {
   position: fixed;
   bottom: 28px;
   right: 28px;
-  background: var(--text-primary);
-  color: #fff;
+  background: var(--inverse-surface);
+  color: var(--inverse-text);
   padding: 14px 20px;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
@@ -1460,7 +1551,7 @@ a {
 }
 
 .segmented__option.active {
-  background: #fff;
+  background: var(--surface);
   color: var(--text-primary);
   box-shadow: var(--shadow-xs);
 }
@@ -1628,6 +1719,461 @@ a {
   color: var(--text-primary);
 }
 
+.auth-card--form {
+  max-width: 440px;
+  text-align: left;
+}
+
+.auth-card--form .auth-card__title,
+.auth-card--form .auth-card__text {
+  text-align: center;
+}
+
+.auth-card__tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.auth-card__tabs .segmented {
+  width: 100%;
+}
+
+.auth-card__tabs .segmented__option {
+  flex: 1;
+}
+
+.auth-card__footer {
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------------ */
+/* Reminders module (stats, schedule, cards, calendar)                */
+/* ------------------------------------------------------------------ */
+
+.stats--5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+.btn--ghost:hover {
+  background: var(--bg);
+  color: var(--text-primary);
+}
+
+.btn--ghost.btn--danger {
+  color: var(--danger);
+}
+
+.btn--ghost.btn--danger:hover {
+  background: var(--danger-tint);
+}
+
+.btn--ghost.btn--success {
+  color: var(--success-text);
+}
+
+.btn--ghost.btn--success:hover {
+  background: var(--success-tint);
+}
+
+.field-error {
+  display: block;
+  font-size: 12px;
+  color: var(--danger);
+  min-height: 14px;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  padding: 24px;
+  margin: 0;
+}
+
+.toast--error {
+  background: var(--danger);
+  color: #fff;
+}
+
+.toast--success {
+  background: var(--success);
+  color: #fff;
+}
+
+/* Today's schedule */
+.schedule-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: background-color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+
+.schedule-item:hover {
+  background: var(--bg);
+}
+
+.schedule-item__time {
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 72px;
+  flex-shrink: 0;
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot--completed {
+  background: var(--success);
+}
+
+.status-dot--upcoming {
+  background: var(--primary);
+}
+
+.status-dot--missed {
+  background: var(--danger);
+}
+
+.schedule-item__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.schedule-item__name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.schedule-item__meta {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Reminder cards */
+.reminder-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.reminder-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  transition: border-color 0.2s var(--ease), background-color 0.2s var(--ease),
+    opacity 0.18s var(--ease), transform 0.18s var(--ease);
+}
+
+.reminder-card:hover {
+  border-color: var(--border-strong);
+}
+
+.reminder-card--disabled {
+  opacity: 0.55;
+}
+
+.reminder-card--removing {
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+.reminder-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.reminder-card__name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.reminder-card__dosage {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.reminder-card__time {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  text-align: right;
+}
+
+.reminder-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.tag--priority-normal {
+  background: var(--tag-bg);
+}
+
+.tag--priority-important {
+  background: var(--warning-tint);
+  color: var(--warning-text);
+}
+
+.tag--priority-critical {
+  background: var(--danger-tint);
+  color: var(--danger-text);
+}
+
+.reminder-card__status {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 11px;
+  border-radius: var(--radius-pill);
+}
+
+.reminder-card__notes {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+
+.reminder-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Calendar */
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.calendar-nav__label {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar__weekday {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  padding: 6px 0;
+}
+
+.calendar__day {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.calendar__day:hover {
+  background: var(--bg);
+}
+
+.calendar__day--empty {
+  cursor: default;
+  pointer-events: none;
+}
+
+.calendar__day--today {
+  font-weight: 700;
+  color: var(--primary);
+  box-shadow: inset 0 0 0 1.5px var(--primary);
+}
+
+.calendar__day--selected {
+  background: var(--primary);
+  color: #fff;
+}
+
+.calendar__day--selected:hover {
+  background: var(--primary-hover);
+}
+
+.calendar__day-dots {
+  position: absolute;
+  bottom: 4px;
+  display: flex;
+  gap: 2px;
+}
+
+.calendar__day-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+.calendar__day--selected .calendar__day-dot {
+  background: #fff;
+}
+
+.calendar-day-detail {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.calendar-day-detail__title {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.calendar-day-detail__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.calendar-day-detail__list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 8px 10px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+
+/* ------------------------------------------------------------------ */
+/* Theme toggle                                                        */
+/* ------------------------------------------------------------------ */
+
+.theme-toggle {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 500;
+  transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease),
+    box-shadow 0.2s var(--ease), transform 0.15s var(--ease);
+}
+
+.theme-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.theme-toggle:active {
+  transform: scale(0.92);
+}
+
+.theme-toggle__icon {
+  position: absolute;
+  font-size: 19px;
+  line-height: 1;
+  transition: opacity 0.3s var(--ease), transform 0.4s var(--ease-spring);
+}
+
+.theme-toggle__icon--sun {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.theme-toggle__icon--moon {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.5);
+}
+
+:root[data-theme="dark"] .theme-toggle__icon--sun {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.5);
+}
+
+:root[data-theme="dark"] .theme-toggle__icon--moon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Status messages (inline form/auth feedback)                        */
+/* ------------------------------------------------------------------ */
+
+.status-message {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  line-height: 1.5;
+}
+
+.status-message--error {
+  background: var(--danger-tint);
+  color: var(--danger-text);
+}
+
+.status-message--success {
+  background: var(--success-tint);
+  color: var(--success-text);
+}
+
 /* ------------------------------------------------------------------ */
 /* Responsive                                                          */
 /* ------------------------------------------------------------------ */
@@ -1635,6 +2181,10 @@ a {
 @media (max-width: 960px) {
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .stats--5 {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -1657,6 +2207,14 @@ a {
 
   .scan-preview {
     flex-direction: column;
+  }
+
+  .stats--5 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .reminder-cards {
+    grid-template-columns: 1fr;
   }
 
   .toast {
