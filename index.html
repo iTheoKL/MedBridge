@@ -127,6 +127,18 @@
 
               <li class="reminder-item">
                 <div class="reminder-item__time">
+                  <span class="reminder-item__hour">9:00 AM</span>
+                  <span class="reminder-item__day">Today</span>
+                </div>
+                <div class="reminder-item__details">
+                  <p class="reminder-item__name">Aspirin — 400mg</p>
+                  <p class="reminder-item__meta">1 tablet · With breakfast</p>
+                </div>
+                <span class="pill pill--warning">Interaction Risk</span>
+              </li>
+
+              <li class="reminder-item">
+                <div class="reminder-item__time">
                   <span class="reminder-item__hour">1:00 PM</span>
                   <span class="reminder-item__day">Today</span>
                 </div>
@@ -139,6 +151,18 @@
 
               <li class="reminder-item">
                 <div class="reminder-item__time">
+                  <span class="reminder-item__hour">2:00 PM</span>
+                  <span class="reminder-item__day">Today</span>
+                </div>
+                <div class="reminder-item__details">
+                  <p class="reminder-item__name">Paracetamol — 500mg</p>
+                  <p class="reminder-item__meta">1 tablet · After lunch</p>
+                </div>
+                <span class="pill pill--upcoming">Upcoming</span>
+              </li>
+
+              <li class="reminder-item">
+                <div class="reminder-item__time">
                   <span class="reminder-item__hour">8:00 PM</span>
                   <span class="reminder-item__day">Today</span>
                 </div>
@@ -147,18 +171,6 @@
                   <p class="reminder-item__meta">1 tablet · Before bed</p>
                 </div>
                 <span class="pill pill--warning">Interaction Risk</span>
-              </li>
-
-              <li class="reminder-item">
-                <div class="reminder-item__time">
-                  <span class="reminder-item__hour">8:00 AM</span>
-                  <span class="reminder-item__day">Tomorrow</span>
-                </div>
-                <div class="reminder-item__details">
-                  <p class="reminder-item__name">Metformin — 500mg</p>
-                  <p class="reminder-item__meta">1 tablet · With breakfast</p>
-                </div>
-                <span class="pill pill--upcoming">Upcoming</span>
               </li>
             </ul>
           </section>
@@ -176,6 +188,22 @@
                 <div class="interaction-item__body">
                   <p class="interaction-item__pair">Warfarin + Ibuprofen</p>
                   <p class="interaction-item__desc">High risk — increased bleeding potential.</p>
+                </div>
+              </li>
+
+              <li class="interaction-item interaction-item--danger">
+                <span class="interaction-item__icon">⚠️</span>
+                <div class="interaction-item__body">
+                  <p class="interaction-item__pair">Warfarin + Aspirin</p>
+                  <p class="interaction-item__desc">High risk — increased bleeding potential.</p>
+                </div>
+              </li>
+
+              <li class="interaction-item interaction-item--warning">
+                <span class="interaction-item__icon">⚡</span>
+                <div class="interaction-item__body">
+                  <p class="interaction-item__pair">Aspirin + Ibuprofen</p>
+                  <p class="interaction-item__desc">Moderate risk — increased gastrointestinal bleeding risk.</p>
                 </div>
               </li>
 
@@ -204,15 +232,15 @@
             </div>
             <div class="stats">
               <div class="stat">
-                <p class="stat__value">3</p>
+                <p class="stat__value">5</p>
                 <p class="stat__label">Active Medications</p>
               </div>
               <div class="stat">
-                <p class="stat__value">4</p>
+                <p class="stat__value">9</p>
                 <p class="stat__label">Reminders Today</p>
               </div>
               <div class="stat">
-                <p class="stat__value stat__value--danger">1</p>
+                <p class="stat__value stat__value--danger">2</p>
                 <p class="stat__label">High-Risk Interactions</p>
               </div>
             </div>
