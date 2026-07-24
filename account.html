@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedBridge · Manage Account</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app">
+    <!-- Side Menu -->
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <span class="sidebar__logo">🩺</span>
+        <span class="sidebar__title">MedBridge</span>
+      </div>
+
+      <nav class="sidebar__nav">
+        <a href="ocr.html" class="nav-item" data-page="ocr">
+          <span class="nav-item__icon">📷</span>
+          <span class="nav-item__label">OCR Scan</span>
+        </a>
+        <a href="medications.html" class="nav-item" data-page="medications">
+          <span class="nav-item__icon">💊</span>
+          <span class="nav-item__label">List of Medications</span>
+        </a>
+        <a href="reminders.html" class="nav-item" data-page="reminders">
+          <span class="nav-item__icon">⏰</span>
+          <span class="nav-item__label">Reminders</span>
+        </a>
+        <a href="report.html" class="nav-item" data-page="report">
+          <span class="nav-item__icon">📄</span>
+          <span class="nav-item__label">Download Report</span>
+        </a>
+        <a href="symptoms.html" class="nav-item" data-page="symptoms">
+          <span class="nav-item__icon">🩹</span>
+          <span class="nav-item__label">Symptoms</span>
+        </a>
+      </nav>
+
+      <div class="sidebar__footer">
+        <p>&copy; 2026 MedBridge</p>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar__left">
+          <h1 class="topbar__title">Manage Account</h1>
+        </div>
+
+        <div class="topbar__right">
+          <div class="user-menu" id="userMenu">
+            <button class="user-menu__trigger" id="userMenuTrigger" aria-haspopup="true" aria-expanded="false">
+              <span class="user-menu__avatar">JD</span>
+              <span class="user-menu__name">Jane Doe</span>
+              <span class="user-menu__caret">▾</span>
+            </button>
+
+            <div class="user-menu__dropdown" id="userMenuDropdown">
+              <a href="account.html" class="user-menu__item">
+                <span class="user-menu__item-icon">⚙️</span> Manage Account
+              </a>
+              <a href="logout.html" class="user-menu__item user-menu__item--danger">
+                <span class="user-menu__item-icon">🚪</span> Log Out
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <main class="content">
+        <div class="grid">
+          <!-- Profile -->
+          <section class="card">
+            <div class="card__header">
+              <h2 class="card__title">Profile</h2>
+            </div>
+            <form id="profileForm">
+              <div class="form-row" style="margin-bottom: 14px;">
+                <div class="form-group">
+                  <label class="form-label" for="fullName">Full Name</label>
+                  <input type="text" class="form-input" id="fullName" value="Jane Doe" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="email">Email</label>
+                  <input type="email" class="form-input" id="email" value="jane.doe@example.com" required />
+                </div>
+              </div>
+              <div class="form-row" style="margin-bottom: 18px;">
+                <div class="form-group">
+                  <label class="form-label" for="phone">Phone</label>
+                  <input type="tel" class="form-input" id="phone" value="+1 (555) 123-4567" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="dob">Date of Birth</label>
+                  <input type="date" class="form-input" id="dob" value="1990-05-14" />
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn btn--primary">Save Changes</button>
+              </div>
+            </form>
+          </section>
+
+          <!-- Password -->
+          <section class="card">
+            <div class="card__header">
+              <h2 class="card__title">Change Password</h2>
+            </div>
+            <form id="passwordForm">
+              <div class="form-group" style="margin-bottom: 14px;">
+                <label class="form-label" for="currentPassword">Current Password</label>
+                <input type="password" class="form-input" id="currentPassword" required />
+              </div>
+              <div class="form-row" style="margin-bottom: 18px;">
+                <div class="form-group">
+                  <label class="form-label" for="newPassword">New Password</label>
+                  <input type="password" class="form-input" id="newPassword" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="confirmPassword">Confirm New Password</label>
+                  <input type="password" class="form-input" id="confirmPassword" required />
+                </div>
+              </div>
+              <p class="form-hint" id="passwordHint">Use at least 8 characters, with a number and a symbol.</p>
+              <div class="form-actions">
+                <button type="submit" class="btn btn--primary">Update Password</button>
+              </div>
+            </form>
+          </section>
+
+          <!-- Notifications -->
+          <section class="card">
+            <div class="card__header">
+              <h2 class="card__title">Notifications</h2>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <p class="toggle-row__label">Reminder Alerts</p>
+                <p class="toggle-row__desc">Get notified when it's time to take a medication.</p>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" checked />
+                <span class="toggle__track"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <p class="toggle-row__label">Interaction Warnings</p>
+                <p class="toggle-row__desc">Be alerted about potential drug interactions.</p>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" checked />
+                <span class="toggle__track"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <p class="toggle-row__label">Weekly Summary Email</p>
+                <p class="toggle-row__desc">A recap of adherence and symptoms every Monday.</p>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" />
+                <span class="toggle__track"></span>
+              </label>
+            </div>
+          </section>
+
+          <!-- Danger zone -->
+          <section class="card">
+            <div class="card__header">
+              <h2 class="card__title">Danger Zone</h2>
+            </div>
+            <p class="card__subtitle" style="margin-bottom: 14px;">
+              Deleting your account permanently removes your medications, reminders, and history. This cannot be undone.
+            </p>
+            <button class="btn" id="deleteAccountBtn" style="background: var(--danger-tint); color: var(--danger);">
+              Delete Account
+            </button>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <span class="toast__icon">✅</span>
+    <span id="toastMessage">Saved</span>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script src="js/account.js"></script>
+</body>
+</html>

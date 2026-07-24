@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedBridge · Logged Out</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card">
+      <div class="auth-card__brand">
+        <span>🩺</span>
+        <span>MedBridge</span>
+      </div>
+
+      <div class="auth-card__icon">✓</div>
+      <h1 class="auth-card__title">You've been logged out</h1>
+      <p class="auth-card__text">
+        You have successfully signed out of your MedBridge account. Redirecting you to the sign-in
+        screen in <span id="countdown">5</span>s.
+      </p>
+
+      <a href="index.html" class="btn btn--primary btn--full" id="loginAgainBtn">Log Back In</a>
+    </div>
+  </div>
+
+  <script src="js/logout.js"></script>
+</body>
+</html>
