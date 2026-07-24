@@ -1,1 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedBridge · Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app">
+    <!-- Side Menu -->
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <span class="sidebar__logo">🩺</span>
+        <span class="sidebar__title">MedBridge</span>
+      </div>
 
+      <nav class="sidebar__nav">
+        <a href="ocr.html" class="nav-item" data-page="ocr">
+          <span class="nav-item__icon">📷</span>
+          <span class="nav-item__label">OCR Scan</span>
+        </a>
+        <a href="medications.html" class="nav-item" data-page="medications">
+          <span class="nav-item__icon">💊</span>
+          <span class="nav-item__label">List of Medications</span>
+        </a>
+        <a href="reminders.html" class="nav-item" data-page="reminders">
+          <span class="nav-item__icon">⏰</span>
+          <span class="nav-item__label">Reminders</span>
+        </a>
+        <a href="report.html" class="nav-item" data-page="report">
+          <span class="nav-item__icon">📄</span>
+          <span class="nav-item__label">Download Report</span>
+        </a>
+        <a href="symptoms.html" class="nav-item" data-page="symptoms">
+          <span class="nav-item__icon">🩹</span>
+          <span class="nav-item__label">Symptoms</span>
+        </a>
+      </nav>
+
+      <div class="sidebar__footer">
+        <p>&copy; 2026 MedBridge</p>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar__left">
+          <h1 class="topbar__title">Dashboard</h1>
+        </div>
+
+        <div class="topbar__right">
+          <div class="user-menu" id="userMenu">
+            <button class="user-menu__trigger" id="userMenuTrigger" aria-haspopup="true" aria-expanded="false">
+              <span class="user-menu__avatar">JD</span>
+              <span class="user-menu__name">Jane Doe</span>
+              <span class="user-menu__caret">▾</span>
+            </button>
+
+            <div class="user-menu__dropdown" id="userMenuDropdown">
+              <a href="account.html" class="user-menu__item">
+                <span class="user-menu__item-icon">⚙️</span> Manage Account
+              </a>
+              <a href="logout.html" class="user-menu__item user-menu__item--danger">
+                <span class="user-menu__item-icon">🚪</span> Log Out
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <main class="content">
+        <!-- Drug Interaction Alert -->
+        <section class="alert alert--danger" id="interactionAlert">
+          <div class="alert__icon">⚠️</div>
+          <div class="alert__body">
+            <h3 class="alert__title">Potential Drug Interaction Detected</h3>
+            <p class="alert__text">
+              <strong>Warfarin</strong> and <strong>Ibuprofen</strong> may increase the risk of bleeding when
+              taken together. Please consult your doctor or pharmacist before continuing.
+            </p>
+          </div>
+          <button class="alert__dismiss" id="dismissAlert" aria-label="Dismiss alert">&times;</button>
+        </section>
+
+        <div class="grid">
+          <!-- Upcoming Reminders -->
+          <section class="card">
+            <div class="card__header">
+              <h2 class="card__title">Upcoming Reminders</h2>
+              <a href="reminders.html" class="card__link">View all</a>
+            </div>
+
+            <ul class="reminder-list">
+              <li class="reminder-item">
+                <div class="reminder-item__time">
+                  <span class="reminder-item__hour">8:00 AM</span>
+                  <span class="reminder-item__day">Today</span>
+                </div>
+                <div class="reminder-item__details">
+                  <p class="reminder-item__name">Metformin — 500mg</p>
+                  <p class="reminder-item__meta">1 tablet · With breakfast</p>
+                </div>
+                <span class="pill pill--upcoming">Upcoming</span>
+              </li>
+
+              <li class="reminder-item">
+                <div class="reminder-item__time">
+                  <span class="reminder-item__hour">1:00 PM</span>
+                  <span class="reminder-item__day">Today</span>
+                </div>
+                <div class="reminder-item__details">
+                  <p class="reminder-item__name">Ibuprofen — 200mg</p>
+                  <p class="reminder-item__meta">1 tablet · After lunch</p>
+                </div>
+                <span class="pill pill--warning">Interaction Risk</span>
+              </li>
+
+              <li class="reminder-item">
+                <div class="reminder-item__time">
+                  <span class="reminder-item__hour">8:00 PM</span>
+                  <span class="reminder-item__day">Today</span>
+                </div>
+                <div class="reminder-item__details">
+                  <p class="reminder-item__name">Warfarin — 5mg</p>
+                  <p class="reminder-item__meta">1 tablet · Before bed</p>
+                </div>
+                <span class="pill pill--warning">Interaction Risk</span>
+              </li>
+
+              <li class="reminder-item">
+                <div class="reminder-item__time">
+                  <span class="reminder-item__hour">8:00 AM</span>
+                  <span class="reminder-item__day">Tomorrow</span>
+                </div>
+                <div class="reminder-item__details">
+                  <p class="reminder-item__name">Metformin — 500mg</p>
+                  <p class="reminder-item__meta">1 tablet · With breakfast</p>
+                </div>
+                <span class="pill pill--upcoming">Upcoming</span>
+              </li>
+            </ul>
+          </section>
+
+          <!-- Drug Interactions Summary -->
+          <section class="card">
+            <div class="card__header">
+              <h2 class="card__title">Drug Interaction Check</h2>
+              <a href="medications.html" class="card__link">Manage medications</a>
+            </div>
+
+            <ul class="interaction-list">
+              <li class="interaction-item interaction-item--danger">
+                <span class="interaction-item__icon">⚠️</span>
+                <div class="interaction-item__body">
+                  <p class="interaction-item__pair">Warfarin + Ibuprofen</p>
+                  <p class="interaction-item__desc">High risk — increased bleeding potential.</p>
+                </div>
+              </li>
+
+              <li class="interaction-item interaction-item--warning">
+                <span class="interaction-item__icon">⚡</span>
+                <div class="interaction-item__body">
+                  <p class="interaction-item__pair">Metformin + Ibuprofen</p>
+                  <p class="interaction-item__desc">Moderate risk — monitor kidney function.</p>
+                </div>
+              </li>
+
+              <li class="interaction-item interaction-item--safe">
+                <span class="interaction-item__icon">✅</span>
+                <div class="interaction-item__body">
+                  <p class="interaction-item__pair">Metformin + Warfarin</p>
+                  <p class="interaction-item__desc">No known interaction.</p>
+                </div>
+              </li>
+            </ul>
+          </section>
+
+          <!-- Quick Stats -->
+          <section class="card card--stats">
+            <div class="card__header">
+              <h2 class="card__title">Overview</h2>
+            </div>
+            <div class="stats">
+              <div class="stat">
+                <p class="stat__value">3</p>
+                <p class="stat__label">Active Medications</p>
+              </div>
+              <div class="stat">
+                <p class="stat__value">4</p>
+                <p class="stat__label">Reminders Today</p>
+              </div>
+              <div class="stat">
+                <p class="stat__value stat__value--danger">1</p>
+                <p class="stat__label">High-Risk Interactions</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
