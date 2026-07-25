@@ -45,7 +45,7 @@ The project started as a static frontend concept and has since grown into a work
 - `js/theme.js` plus new CSS variables — light/dark theme support (`medbridge-theme` preference), added across every page (index, medications, OCR, reminders, report, symptoms)
 - `.vercelignore` — excludes the Python backend and local-only files from the frontend's Vercel deployment
 
-### Drug Database — Theo ([@iTheoKL](https://github.com/iTheoKL)) / Barath ([@barathchandp](https://github.com/barathchandp))
+### Drug Database — Dhayalan ([@iTheoKL](https://github.com/iTheoKL)) / Barath ([@barathchandp](https://github.com/barathchandp))
 - `database/medications.csv` — an extensive India-focused A–Z medicines dataset (renamed/relocated a couple of times before settling here)
 - `database/data.json`, `database/users.json`, `database/placeholder.md` — supporting data files for the app
 
