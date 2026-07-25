@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedBridge · Interaction Checker</title>
+  <script>
+    (function () {
+      var stored = localStorage.getItem("medbridge-theme");
+      var theme = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <script>
+    (function () {
+      var session = null;
+      try { session = JSON.parse(localStorage.getItem("medbridge-auth")); } catch (e) {}
+      if (!session || !session.username) {
+        window.location.replace("login.html");
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Page-specific additions (kept inline rather than touching the shared stylesheet) -->
+  <style>
+    /* "Safe / no known interaction" variant of .result-group, to match the
+       existing danger/warning/new variants already defined in css/style.css */
+    .result-group--safe {
+      background: var(--success-tint);
+    }
+    .result-group__title--safe {
+      color: var(--success-text);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Side Menu -->
+    <aside class="sidebar">
+      <a href="index.html" class="sidebar__brand" style="text-decoration: none; cursor: pointer;">
+        <span class="sidebar__logo">🩺</span>
+        <span class="sidebar__title">MedBridge</span>
+      </a>
+
+      <nav class="sidebar__nav">
+        <a href="ocr.html" class="nav-item" data-page="ocr">
+          <span class="nav-item__icon">📷</span>
+          <span class="nav-item__label">OCR Scan</span>
+        </a>
+        <a href="medications.html" class="nav-item" data-page="medications">
+          <span class="nav-item__icon">💊</span>
+          <span class="nav-item__label">List of Medications</span>
+        </a>
+        <a href="reminders.html" class="nav-item" data-page="reminders">
+          <span class="nav-item__icon">⏰</span>
+          <span class="nav-item__label">Reminders</span>
+        </a>
+        <a href="interactions.html" class="nav-item active" data-page="interactions">
+          <span class="nav-item__icon">⚠️</span>
+          <span class="nav-item__label">Interaction Checker</span>
+        </a>
+        <a href="report.html" class="nav-item" data-page="report">
+          <span class="nav-item__icon">📄</span>
+          <span class="nav-item__label">Download Report</span>
+        </a>
+        <a href="symptoms.html" class="nav-item" data-page="symptoms">
+          <span class="nav-item__icon">🩹</span>
+          <span class="nav-item__label">Symptoms</span>
+        </a>
+      </nav>
+
+      <div class="sidebar__footer">
+        <p>&copy; 2026 MedBridge</p>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar__left">
+          <h1 class="topbar__title">Interaction Checker</h1>
+        </div>
+
+        <div class="topbar__right">
+          <div class="user-menu" id="userMenu">
+            <button class="user-menu__trigger" id="userMenuTrigger" aria-haspopup="true" aria-expanded="false">
+              <span class="user-menu__avatar">JD</span>
+              <span class="user-menu__name">Jane Doe</span>
+              <span class="user-menu__caret">▾</span>
+            </button>
+
+            <div class="user-menu__dropdown" id="userMenuDropdown">
+              <a href="account.html" class="user-menu__item">
+                <span class="user-menu__item-icon">⚙️</span> Manage Account
+              </a>
+              <a href="logout.html" class="user-menu__item user-menu__item--danger">
+                <span class="user-menu__item-icon">🚪</span> Log Out
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page Content -->
+      <main class="content" id="interactionsPage">
+
+        <!-- Disclaimer -->
+        <div class="alert" style="background: var(--warning-tint); margin-bottom: 24px;">
+          <div class="alert__icon">⚠️</div>
+          <div class="alert__body">
+            <h3 class="alert__title" style="color: var(--warning-text);">Demo Dataset Only</h3>
+            <p class="alert__text" style="color: var(--warning-text);">
+              This checker only covers interactions between the 5 medications tracked in your account, using a
+              curated demo dataset — not a full clinical database. Always confirm with a pharmacist or doctor
+              before making medication decisions.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <!-- Left: your current medicines -->
+          <section class="card">
+            <div class="card__header">
+              <h2 class="card__title">Your Medications</h2>
+            </div>
+            <p class="card__subtitle">The medications currently on your list.</p>
+            <div class="symptom-chips" id="yourMedsList"></div>
+            <button type="button" class="btn btn--secondary btn--sm" id="checkMineBtn" style="margin-top: 16px;">
+              Check My Medications
+            </button>
+          </section>
+
+          <!-- Right: manual checker -->
+          <section class="card">
+            <div class="card__header">
+              <h2 class="card__title">Check a Combination</h2>
+            </div>
+            <p class="card__subtitle">Choose from your 5 tracked medications.</p>
+
+            <div class="symptom-input-row">
+              <select class="form-select" id="drugSelect"></select>
+              <button type="button" class="btn btn--primary" id="addDrugBtn">Add</button>
+            </div>
+
+            <div class="symptom-chips" id="manualChips" style="margin-top: 14px;"></div>
+            <p class="empty-hint" id="manualEmptyHint" style="margin-top: 10px;">
+              Add at least 2 medications to check for interactions.
+            </p>
+
+            <div class="form-actions" style="justify-content: flex-start; margin-top: 18px;">
+              <button type="button" class="btn btn--primary" id="checkBtn" disabled>Check Interactions</button>
+              <button type="button" class="btn btn--secondary" id="clearBtn">Clear</button>
+            </div>
+          </section>
+        </div>
+
+        <!-- Results -->
+        <section class="card" id="resultsCard" style="margin-top: 20px;" hidden>
+          <div class="card__header">
+            <h2 class="card__title">Results</h2>
+          </div>
+          <p class="card__subtitle" id="resultsSummary"></p>
+          <div class="results" id="resultsList"></div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <span class="toast__icon">✅</span>
+    <span id="toastMessage">Saved</span>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script src="js/interactions.js"></script>
+  <script src="js/theme.js"></script>
+</body>
+</html>
